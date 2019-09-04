@@ -1,5 +1,6 @@
 # Dash
-Houdini asyncio's web-based services for registration and avatar generation.
+
+A simple web system/API for houdini-asyncio's registration and avatar generation.
 
 
 warning: incomplete.
