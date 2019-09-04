@@ -1,17 +1,24 @@
 from urllib.parse import parse_qs
 from sanic import Sanic, response
+from data.penguin import Penguin, db
 
 import re
 import urllib.parse
 
 config = {
     'allowed_chars': re.compile(r"^[^<>/{}[\]~`]*$"),
-    'port': 3000
+    'port': 3000,
+    'database': {
+        'Address': 'localhost',
+        'Username': 'postgres',
+        'Password': 'password',
+        'Name': 'houdini'
+    }
 }
 
 app = Sanic()
 @app.route('/', methods=["POST"])
-def register(request):
+async def register(request):
     query_string = request.body.decode('UTF-8')
     global post_data
     post_data = parse_qs(query_string)
@@ -43,6 +50,22 @@ def register(request):
 
         elif not color.isdigit() or int(color) not in range(1, 15):
             return response.text(build_query({'error': ''}))
+
+        await db.set_bind('postgresql://{}:{}@{}/{}'.format(
+            config['database']['Username'], config['database']['Password'],
+            config['database']['Address'],
+            config['database']['Name']))
+
+        user_count = await username_count(username[0])
+
+        if user_count:
+            print(user_count)
+
+
+async def username_count(value):
+    user_count = await db.select([db.func.count(Penguin.username)]).where(
+        Penguin.username == value).gino.scalar()
+    return user_count >= 1
 
 
 def attempt_data_retrieval(key):
