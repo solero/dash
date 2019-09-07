@@ -4,17 +4,31 @@ from data.penguin import Penguin, db
 
 import re
 import urllib.parse
+import urllib.request
+import secrets
+import json
 
 config = {
-    'allowed_chars': re.compile(r"^[^<>/{}[\]~`]*$"),
+    'allowed_chars': re.compile(r"^[^<>/{}[\]~|'`]*$"),
     'port': 3000,
     'database': {
         'Address': 'localhost',
         'Username': 'postgres',
         'Password': 'password',
         'Name': 'houdini'
-    }
+    },
+    'ForcedCase': True,
+    'CloudFlare': False,
+    'SecretKey': '6Lc-NbcUAAAAAAwk7mJ3p_B66ov7y-MXdiP7vQ8u',
+    # 'EmailWhiteList': ["gmail.com", "hotmail.com"],
+    # 'EmailWhiteList': '/path/to/whitelist',
+    'EmailWhiteList': ''
 }
+if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
+    email_list = open(config['EmailWhiteList'], 'r')
+    white_list = email_list.readlines()
+    email_list.close()
+    config['EmailWhiteList'] = white_list
 
 app = Sanic()
 @app.route('/', methods=["POST"])
@@ -69,6 +83,41 @@ async def register(request):
                     break
             return response.text(build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
 
+        username = username[0]
+        global session
+        session = {'sid': secrets.token_urlsafe(16), 'username': username[0].lower() + username[1:] if config['ForcedCase'] else username, 'color': color}
+        return response.text(build_query({'success': 1, "sid": session['sid']}))
+
+    elif action == 'validate_password_email':
+        session_id = attempt_data_retrieval("sid", True)
+        username = attempt_data_retrieval("username", True)
+        color = attempt_data_retrieval("color", True)
+        password = attempt_data_retrieval('password')[0]
+        password_confirm = attempt_data_retrieval('password_confirm')[0]
+        email = attempt_data_retrieval('email')[0]
+        if config['SecretKey']:
+            g_token = attempt_data_retrieval('gtoken')[0]
+            ip = request.headers.get('HTTP_CF_CONNECTING_IP') if config['CloudFlare'] else request.headers.get('x-forwarded-for')
+            url = 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s' % (config['SecretKey'], g_token, ip)
+            result = urllib.request.urlopen(url)
+            captcha = json.loads(result.read().decode('utf-8'))
+
+        #email_domain = email.split('@')[1]
+
+        if session_id is not session['sid']:
+            return response.text(build_query({'error': localization[lang]['passwords_match']}))
+
+        elif not captcha['success'] and config['SecretKey']:
+            return response.text(build_query({'error': ''}))
+
+        elif str(password) is not str(password_confirm):
+            print(password)
+            print(password_confirm)
+            return response.text(build_query({'error': localization[lang]['passwords_match']}))
+
+        elif len(password) < 4:
+            return response.text(build_query({'error': localization[lang]['password_short']}))
+
 
 async def username_count(value):
     user_count = await db.select([db.func.count(Penguin.username)]).where(
@@ -76,9 +125,12 @@ async def username_count(value):
     return user_count >= 1
 
 
-def attempt_data_retrieval(key):
-    if key in post_data.keys():
+def attempt_data_retrieval(key, session_retrieval=False):
+    if not session_retrieval and key in post_data.keys():
         return post_data[key]
+
+    if session_retrieval and key in session.keys():
+        return session[key]
 
 
 def build_query(data):
