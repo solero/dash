@@ -57,14 +57,22 @@ async def register(request):
             config['database']['Name']))
 
         user_count = await username_count(username[0])
-
         if user_count:
-            print(user_count)
+            i = 0
+            username = re.sub(r'\d+$', '', username[0])
+            while True:
+                i += 1
+                suggestion = username+str(i)
+                if sum(char.isdigit() for char in username) > 1:
+                    return response.text(build_query({'error': localization[lang]['name_taken']}))
+                if not await username_count(suggestion.lower()):
+                    break
+            return response.text(build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
 
 
 async def username_count(value):
     user_count = await db.select([db.func.count(Penguin.username)]).where(
-        Penguin.username == value).gino.scalar()
+        db.func.lower(Penguin.username) == value.lower()).gino.scalar()
     return user_count >= 1
 
 
