@@ -99,10 +99,10 @@ async def validate_password_email(request, response, lang):
     email = attempt_data_retrieval('email')[0]
     if config['SecretKey']:
         g_token = attempt_data_retrieval('gtoken')[0]
-        ip = request.headers.get('HTTP_CF_CONNECTING_IP') if config['CloudFlare'] else request.headers.get(
+        ip = request.headers.get('cf-connecting-ip') if config['CloudFlare'] else request.headers.get(
             'x-forwarded-for')
         url = 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s' % (
-        config['SecretKey'], g_token, ip)
+            config['SecretKey'], g_token, ip)
         result = urllib.request.urlopen(url)
         captcha = json.loads(result.read().decode('utf-8'))
 
