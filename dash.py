@@ -1,34 +1,23 @@
 from urllib.parse import parse_qs
 from sanic import Sanic, response
-from data.penguin import Penguin, db
-
+from data.penguin import Penguin, PenguinItem, PenguinPostcard, db
+from config import config
 import re
 import urllib.parse
 import urllib.request
 import secrets
 import json
+import string
+import hashlib
+import bcrypt
 
-config = {
-    'allowed_chars': re.compile(r"^[^<>/{}[\]~|'`]*$"),
-    'port': 3000,
-    'database': {
-        'Address': 'localhost',
-        'Username': 'postgres',
-        'Password': 'password',
-        'Name': 'houdini'
-    },
-    'ForcedCase': True,
-    'CloudFlare': False,
-    'SecretKey': '6Lc-NbcUAAAAAAwk7mJ3p_B66ov7y-MXdiP7vQ8u',
-    # 'EmailWhiteList': ["gmail.com", "hotmail.com"],
-    # 'EmailWhiteList': '/path/to/whitelist',
-    'EmailWhiteList': ''
-}
 if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
     email_list = open(config['EmailWhiteList'], 'r')
     white_list = email_list.readlines()
     email_list.close()
-    config['EmailWhiteList'] = white_list
+    config['EmailWhiteList'] = []
+    for email in white_list:
+        config['EmailWhiteList'].append(str(email))
 
 app = Sanic()
 @app.route('/', methods=["POST"])
@@ -39,90 +28,156 @@ async def register(request):
     action = attempt_data_retrieval('action')[0]
     lang = attempt_data_retrieval('lang')[0]
     if action == 'validate_agreement':
-        agree_terms = int(attempt_data_retrieval('agree_to_terms')[0])
-        agree_rules = int(attempt_data_retrieval('agree_to_rules')[0])
-        if not agree_terms or not agree_rules:
-            return response.text(build_query({'error': localization[lang]['terms']}))
-        return response.text(build_query({'success': 1}))
+        return validate_agreement(response, lang)
     elif action == 'validate_username':
-        username = attempt_data_retrieval('username')
-        color = attempt_data_retrieval("colour")[0]
-        if not username:
-            return response.text(build_query({'error': localization[lang]['name_missing']}))
-
-        elif len(username[0]) < 4 or len(username[0]) > 12:
-            return response.text(build_query({'error': localization[lang]['name_short']}))
-
-        elif len(re.sub("[^0-9]", "", username[0])) > 5:
-            return response.text(build_query({'error': localization[lang]['name_number']}))
-
-        elif len(re.sub("[^a-zA-Z]", "", username[0])) < 1:
-            return response.text(build_query({'error': localization[lang]['penguin_letter']}))
-
-        elif not config['allowed_chars'].match(username[0]):
-            return response.text(build_query({'error': localization[lang]['name_not_allowed']}))
-
-        elif not color.isdigit() or int(color) not in range(1, 15):
-            return response.text(build_query({'error': ''}))
-
-        await db.set_bind('postgresql://{}:{}@{}/{}'.format(
-            config['database']['Username'], config['database']['Password'],
-            config['database']['Address'],
-            config['database']['Name']))
-
-        user_count = await username_count(username[0])
-        if user_count:
-            i = 0
-            username = re.sub(r'\d+$', '', username[0])
-            while True:
-                i += 1
-                suggestion = username+str(i)
-                if sum(char.isdigit() for char in username) > 1:
-                    return response.text(build_query({'error': localization[lang]['name_taken']}))
-                if not await username_count(suggestion.lower()):
-                    break
-            return response.text(build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
-
-        username = username[0]
-        global session
-        session = {'sid': secrets.token_urlsafe(16), 'username': username[0].lower() + username[1:] if config['ForcedCase'] else username, 'color': color}
-        return response.text(build_query({'success': 1, "sid": session['sid']}))
-
+        return await validate_username(response, lang)
     elif action == 'validate_password_email':
-        session_id = attempt_data_retrieval("sid", True)
-        username = attempt_data_retrieval("username", True)
-        color = attempt_data_retrieval("color", True)
-        password = attempt_data_retrieval('password')[0]
-        password_confirm = attempt_data_retrieval('password_confirm')[0]
-        email = attempt_data_retrieval('email')[0]
-        if config['SecretKey']:
-            g_token = attempt_data_retrieval('gtoken')[0]
-            ip = request.headers.get('HTTP_CF_CONNECTING_IP') if config['CloudFlare'] else request.headers.get('x-forwarded-for')
-            url = 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s' % (config['SecretKey'], g_token, ip)
-            result = urllib.request.urlopen(url)
-            captcha = json.loads(result.read().decode('utf-8'))
+        return await validate_password_email(request, response, lang)
 
-        #email_domain = email.split('@')[1]
 
-        if session_id is not session['sid']:
-            return response.text(build_query({'error': localization[lang]['passwords_match']}))
+def validate_agreement(response, lang):
+    agree_terms = int(attempt_data_retrieval('agree_to_terms')[0])
+    agree_rules = int(attempt_data_retrieval('agree_to_rules')[0])
+    if not agree_terms or not agree_rules:
+        return response.text(build_query({'error': localization[lang]['terms']}))
+    return response.text(build_query({'success': 1}))
 
-        elif not captcha['success'] and config['SecretKey']:
-            return response.text(build_query({'error': ''}))
 
-        elif str(password) is not str(password_confirm):
-            print(password)
-            print(password_confirm)
-            return response.text(build_query({'error': localization[lang]['passwords_match']}))
+async def validate_username(response, lang):
+    username = attempt_data_retrieval('username')
+    color = attempt_data_retrieval("colour")[0]
+    if not username:
+        return response.text(build_query({'error': localization[lang]['name_missing']}))
 
-        elif len(password) < 4:
-            return response.text(build_query({'error': localization[lang]['password_short']}))
+    elif len(username[0]) < 4 or len(username[0]) > 12:
+        return response.text(build_query({'error': localization[lang]['name_short']}))
+
+    elif len(re.sub("[^0-9]", "", username[0])) > 5:
+        return response.text(build_query({'error': localization[lang]['name_number']}))
+
+    elif len(re.sub("[^a-zA-Z]", "", username[0])) < 1:
+        return response.text(build_query({'error': localization[lang]['penguin_letter']}))
+
+    elif not config["allowed_chars"].match(username[0]):
+        return response.text(build_query({'error': localization[lang]['name_not_allowed']}))
+
+    elif not color.isdigit() or int(color) not in range(1, 15):
+        return response.text(build_query({'error': ''}))
+
+    await db.set_bind('postgresql://{}:{}@{}/{}'.format(
+        config['database']['Username'], config['database']['Password'],
+        config['database']['Address'],
+        config['database']['Name']))
+
+    user_count = await username_count(username[0])
+    if user_count:
+        i = 0
+        username = re.sub(r'\d+$', '', username[0])
+        while True:
+            i += 1
+            suggestion = username + str(i)
+            if sum(char.isdigit() for char in username) > 1:
+                return response.text(build_query({'error': localization[lang]['name_taken']}))
+            if not await username_count(suggestion.lower()):
+                break
+        return response.text(
+            build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
+
+    username = username[0]
+    global session
+    session = {'sid': secrets.token_urlsafe(16),
+               'username': username[0].lower() + username[1:] if config['ForcedCase'] else username, 'color': color}
+    return response.text(build_query({'success': 1, "sid": session['sid']}))
+
+
+async def validate_password_email(request, response, lang):
+    session_id = attempt_data_retrieval("sid", True)
+    username = attempt_data_retrieval("username", True)
+    color = attempt_data_retrieval("color", True)
+    password = attempt_data_retrieval('password')[0]
+    password_confirm = attempt_data_retrieval('password_confirm')[0]
+    email = attempt_data_retrieval('email')[0]
+    if config['SecretKey']:
+        g_token = attempt_data_retrieval('gtoken')[0]
+        ip = request.headers.get('HTTP_CF_CONNECTING_IP') if config['CloudFlare'] else request.headers.get(
+            'x-forwarded-for')
+        url = 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s' % (
+        config['SecretKey'], g_token, ip)
+        result = urllib.request.urlopen(url)
+        captcha = json.loads(result.read().decode('utf-8'))
+
+    if session_id != session['sid']:
+        return response.text(build_query({'error': localization[lang]['passwords_match']}))
+
+    elif not captcha['success'] and config['SecretKey']:
+        return response.text(build_query({'error': ''}))
+
+    elif str(password) != str(password_confirm):
+        return response.text(build_query({'error': localization[lang]['passwords_match']}))
+
+    elif len(password) < 4:
+        return response.text(build_query({'error': localization[lang]['password_short']}))
+
+    elif not config['email_regex'].match(email):
+        return response.text(build_query({'error': localization[lang]['email_invalid']}))
+
+    elif email.split('@')[1] not in str(config['EmailWhiteList']) and not isinstance(config['EmailWhiteList'], str):
+        return response.text(build_query({'error': localization[lang]['email_invalid']}))
+
+    elif await email_count(email):
+        return response.text(build_query({'error': localization[lang]['email_invalid']}))
+
+    approve = False if config['Approve'] else True
+    activate = False if config['Activate'] else True
+    password = generate_bcrypt(password).decode('UTF-8')
+    await Penguin.create(username=username, nickname=username, password=password, approval_en=approve,
+                         approval_pt=approve, approval_fr=approve, approval_es=approve,
+                         approval_de=approve, approval_ru=approve, email=email, active=activate, color=int(color))
+
+    data = await Penguin.query.where(Penguin.username == username).gino.first()
+    await PenguinItem.create(penguin_id=data.id, item_id=int(color))
+    await PenguinPostcard.create(penguin_id=data.id, sender_id=None, postcard_id=125)
+    return response.text(build_query({'success': 1}))
+
+
+def generate_random_key():
+    _alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(_alphabet) for _ in range(16))
 
 
 async def username_count(value):
     user_count = await db.select([db.func.count(Penguin.username)]).where(
         db.func.lower(Penguin.username) == value.lower()).gino.scalar()
     return user_count >= 1
+
+
+async def email_count(value):
+    email_count = await db.select([db.func.count(Penguin.email)]).where(
+        db.func.lower(Penguin.email) == value.lower()).gino.scalar()
+    return email_count >= config['MaxPerEmail']
+
+
+def hash(undigested):
+    if type(undigested) == str:
+        undigested = undigested.encode('utf-8')
+    return hashlib.md5(undigested).hexdigest()
+
+
+def encrypt_password(password, digest=True):
+    if digest:
+        password = hash(password)
+
+    swapped_hash = password[16:32] + password[0:16]
+    return swapped_hash
+
+
+def generate_bcrypt(password):
+    password = hashlib.md5(password.encode('utf-8')).hexdigest().upper()
+    key = encrypt_password(password, False)
+    key += 'houdini'
+    key += 'Y(02.>\'H}t":E1'
+    hash = encrypt_password(key)
+    return bcrypt.hashpw(hash.encode('utf-8'), bcrypt.gensalt(12))
 
 
 def attempt_data_retrieval(key, session_retrieval=False):

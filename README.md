@@ -2,6 +2,8 @@
 
 A simple web system/API for houdini-asyncio's registration and avatar generation.
 
-#todo
+# todo
 
-- test registration under cloudflare to see if the header `HTTP_CF_CONNECTING_IP` works correctly!
+- implement email activation
+
+- test registration under cloudflare to see if the header `HTTP_CF_CONNECTING_IP` works correctly
