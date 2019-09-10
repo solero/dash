@@ -2,6 +2,9 @@ from urllib.parse import parse_qs
 from sanic import Sanic, response
 from data.penguin import Penguin, PenguinItem, PenguinPostcard, db
 from config import config
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+import os
 import re
 import urllib.parse
 import urllib.request
@@ -10,6 +13,9 @@ import json
 import string
 import hashlib
 import bcrypt
+import requests
+
+
 
 if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
     email_list = open(config['EmailWhiteList'], 'r')
@@ -64,10 +70,7 @@ async def validate_username(response, lang):
     elif not color.isdigit() or int(color) not in range(1, 15):
         return response.text(build_query({'error': ''}))
 
-    await db.set_bind('postgresql://{}:{}@{}/{}'.format(
-        config['database']['Username'], config['database']['Password'],
-        config['database']['Address'],
-        config['database']['Name']))
+    await db.set_bind(f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
 
     user_count = await username_count(username[0])
     if user_count:
@@ -101,8 +104,7 @@ async def validate_password_email(request, response, lang):
         g_token = attempt_data_retrieval('gtoken')[0]
         ip = request.headers.get('cf-connecting-ip') if config['CloudFlare'] else request.headers.get(
             'x-forwarded-for')
-        url = 'https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s' % (
-            config['SecretKey'], g_token, ip)
+        url = f"https://www.google.com/recaptcha/api/siteverify?secret={config['SecretKey']}&response={g_token}&remoteip={ip}"
         result = urllib.request.urlopen(url)
         captcha = json.loads(result.read().decode('utf-8'))
 
@@ -137,7 +139,26 @@ async def validate_password_email(request, response, lang):
     data = await Penguin.query.where(Penguin.username == username).gino.first()
     await PenguinItem.create(penguin_id=data.id, item_id=int(color))
     await PenguinPostcard.create(penguin_id=data.id, sender_id=None, postcard_id=125)
+
+    if config['Activate']:
+        send_activation()
+
     return response.text(build_query({'success': 1}))
+
+
+def send_activation():
+    link = 'https://youaregay.com'
+    message = Mail(
+        from_email=f"noreply@{config['Hostname']}",
+        to_emails='jakemartinfloyd@gmail.com',
+        subject='Activate your penguin!',
+        html_content=f"<p>Hello,</p> <p>Thank you for creating a penguin on {config['Hostname']}. Please click below to activate your penguin account.</p> <a href='{link}'>Activate</a>"
+    )
+    try:
+        sg = SendGridAPIClient(f"{config['SendGridAPIKey']}")
+        return sg.send(message)
+    except Exception as e:
+        print(e)
 
 
 def generate_random_key():
