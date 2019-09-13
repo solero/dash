@@ -75,6 +75,7 @@ class Penguin(db.Model):
     rejection_de = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     rejection_ru = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
 
+
 class PenguinPostcard(db.Model):
     __tablename__ = 'penguin_postcard'
 
@@ -96,6 +97,14 @@ class PenguinItem(db.Model):
                            primary_key=True, nullable=False)
     item_id = db.Column(db.ForeignKey('item.id', ondelete='CASCADE', onupdate='CASCADE'),
                         primary_key=True, nullable=False)
+
+
+class ActivationKey(db.Model):
+    __tablename__ = 'activation_key'
+
+    penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True,
+                           nullable=False)
+    activation_key = db.Column(db.CHAR(255), primary_key=True, nullable=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
