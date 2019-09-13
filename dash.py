@@ -1,10 +1,9 @@
 from urllib.parse import parse_qs
 from sanic import Sanic, response
-from data.penguin import Penguin, PenguinItem, PenguinPostcard, db
+from data.penguin import Penguin, PenguinItem, PenguinPostcard, ActivationKey, db
 from config import config
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-import os
 import re
 import urllib.parse
 import urllib.request
@@ -13,8 +12,6 @@ import json
 import string
 import hashlib
 import bcrypt
-import requests
-
 
 
 if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
@@ -39,6 +36,24 @@ async def register(request):
         return await validate_username(response, lang)
     elif action == 'validate_password_email':
         return await validate_password_email(request, response, lang)
+
+
+@app.route('//activation/<activation_key>', methods=["GET"])
+async def activate(request, activation_key):
+    await db.set_bind(
+        f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
+    data = await ActivationKey.query.where(ActivationKey.activation_key == activation_key).gino.first()
+    if data is not None:
+        return await handle_activation(data)
+
+    return response.text('Activation key was not found in our records.')
+
+
+async def handle_activation(data):
+    await Penguin.update.values(active=True) \
+        .where(Penguin.id == data.penguin_id).gino.status()
+    await ActivationKey.delete.where((ActivationKey.penguin_id == data.penguin_id)).gino.status()
+    return response.text('Activated penguin, you may now login.')
 
 
 def validate_agreement(response, lang):
@@ -97,9 +112,9 @@ async def validate_password_email(request, response, lang):
     session_id = attempt_data_retrieval("sid", True)
     username = attempt_data_retrieval("username", True)
     color = attempt_data_retrieval("color", True)
-    password = attempt_data_retrieval('password')[0]
-    password_confirm = attempt_data_retrieval('password_confirm')[0]
-    email = attempt_data_retrieval('email')[0]
+    password = attempt_data_retrieval('password')
+    password_confirm = attempt_data_retrieval('password_confirm')
+    email = attempt_data_retrieval('email')
     if config['SecretKey']:
         g_token = attempt_data_retrieval('gtoken')[0]
         ip = request.headers.get('cf-connecting-ip') if config['CloudFlare'] else request.headers.get(
@@ -114,51 +129,49 @@ async def validate_password_email(request, response, lang):
     elif not captcha['success'] and config['SecretKey']:
         return response.text(build_query({'error': ''}))
 
-    elif str(password) != str(password_confirm):
+    elif str(password[0]) != str(password_confirm[0]):
         return response.text(build_query({'error': localization[lang]['passwords_match']}))
 
-    elif len(password) < 4:
+    elif len(password[0]) < 4:
         return response.text(build_query({'error': localization[lang]['password_short']}))
 
-    elif not config['email_regex'].match(email):
+    elif not email:
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
-    elif email.split('@')[1] not in str(config['EmailWhiteList']) and not isinstance(config['EmailWhiteList'], str):
+    elif not config['email_regex'].match(email[0]):
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
-    elif await email_count(email):
+    elif email[0].split('@')[1] not in str(config['EmailWhiteList']) and not isinstance(config['EmailWhiteList'], str):
+        return response.text(build_query({'error': localization[lang]['email_invalid']}))
+
+    elif await email_count(email[0]):
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
     approve = False if config['Approve'] else True
     activate = False if config['Activate'] else True
-    password = generate_bcrypt(password).decode('UTF-8')
+    password = generate_bcrypt(password[0]).decode('UTF-8')
     await Penguin.create(username=username, nickname=username, password=password, approval_en=approve,
                          approval_pt=approve, approval_fr=approve, approval_es=approve,
-                         approval_de=approve, approval_ru=approve, email=email, active=activate, color=int(color))
+                         approval_de=approve, approval_ru=approve, email=email[0], active=activate, color=int(color))
 
     data = await Penguin.query.where(Penguin.username == username).gino.first()
     await PenguinItem.create(penguin_id=data.id, item_id=int(color))
     await PenguinPostcard.create(penguin_id=data.id, sender_id=None, postcard_id=125)
 
     if config['Activate']:
-        send_activation()
+        activation_key = secrets.token_urlsafe(45)
+        link = f"{config['External']}/create_account/create_account.php/activation/{activation_key}"
+        message = Mail(
+            from_email=f"noreply@{config['Hostname']}",
+            to_emails=email[0],
+            subject='Activate your penguin!',
+            html_content=f"<p>Hello,</p> <p>Thank you for creating a penguin on {config['Hostname']}. Please click below to activate your penguin account.</p> <a href='{link}'>Activate</a>"
+        )
+        sg = SendGridAPIClient(f"{config['SendGridAPIKey']}")
+        sg.send(message)
+        await ActivationKey.create(penguin_id=data.id, activation_key=activation_key)
 
     return response.text(build_query({'success': 1}))
-
-
-def send_activation():
-    link = 'https://youaregay.com'
-    message = Mail(
-        from_email=f"noreply@{config['Hostname']}",
-        to_emails='jakemartinfloyd@gmail.com',
-        subject='Activate your penguin!',
-        html_content=f"<p>Hello,</p> <p>Thank you for creating a penguin on {config['Hostname']}. Please click below to activate your penguin account.</p> <a href='{link}'>Activate</a>"
-    )
-    try:
-        sg = SendGridAPIClient(f"{config['SendGridAPIKey']}")
-        return sg.send(message)
-    except Exception as e:
-        print(e)
 
 
 def generate_random_key():
