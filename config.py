@@ -12,11 +12,14 @@ config = {
     },
     'ForcedCase': True,
     'CloudFlare': False,
-    'SecretKey': '6Lc-NbcUAAAAAAwk7mJ3p_B66ov7y-MXdiP7vQ8u',
+    'SecretKey': '',
     # 'EmailWhiteList': ["gmail.com", "hotmail.com"],
     # 'EmailWhiteList': '/path/to/whitelist',
     'EmailWhiteList': '',
     'MaxPerEmail': 5,
     'Activate': False,
-    'Approve': False
+    'Approve': False,
+    'SendGridAPIKey': '',
+    'Hostname': 'play.houdi.ni',
+    'External': 'http://play.houdi.ni'
 }
