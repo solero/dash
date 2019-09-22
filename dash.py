@@ -23,7 +23,9 @@ if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
         config['EmailWhiteList'].append(str(email))
 
 app = Sanic()
-@app.route('/', methods=["POST"])
+
+
+@app.route('/create_account', methods=["POST"])
 async def register(request):
     query_string = request.body.decode('UTF-8')
     global post_data
@@ -38,7 +40,7 @@ async def register(request):
         return await validate_password_email(request, response, lang)
 
 
-@app.route('//activation/<activation_key>', methods=["GET"])
+@app.route('/activation/<activation_key>', methods=["GET"])
 async def activate(request, activation_key):
     await db.set_bind(
         f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
@@ -160,7 +162,7 @@ async def validate_password_email(request, response, lang):
 
     if config['Activate']:
         activation_key = secrets.token_urlsafe(45)
-        link = f"{config['External']}/create_account/create_account.php/activation/{activation_key}"
+        link = f"{config['External']}/activation/{activation_key}"
         message = Mail(
             from_email=f"noreply@{config['Hostname']}",
             to_emails=email[0],
