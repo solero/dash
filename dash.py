@@ -51,6 +51,22 @@ async def activate(request, activation_key):
     return response.text('Activation key was not found in our records.')
 
 
+@app.route('/avatar/<penguin_id>', methods=["GET"])
+async def avatar(request, penguin_id):
+    await db.set_bind(
+        f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
+    if not penguin_id.isdigit():
+        return response.text('Penguin ID is not a digit')
+    penguin_id = int(penguin_id)
+    user_count = await id_count(penguin_id)
+    if not user_count:
+        return response.text('This penguin ID does not exist')
+
+    items = await Penguin.select('color', 'head', 'face', 'neck', 'body', 'hand', 'feet', 'photo', 'flag').where(Penguin.id == penguin_id).gino.first()
+
+    return response.text(items)
+
+
 async def handle_activation(data):
     await Penguin.update.values(active=True) \
         .where(Penguin.id == data.penguin_id).gino.status()
@@ -184,6 +200,11 @@ def generate_random_key():
 async def username_count(value):
     user_count = await db.select([db.func.count(Penguin.username)]).where(
         db.func.lower(Penguin.username) == value.lower()).gino.scalar()
+    return user_count >= 1
+
+
+async def id_count(value):
+    user_count = await db.select([db.func.count(Penguin.id)]).where(Penguin.id == value).gino.scalar()
     return user_count >= 1
 
 
