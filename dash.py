@@ -4,6 +4,9 @@ from data.penguin import Penguin, PenguinItem, PenguinPostcard, ActivationKey, d
 from config import config
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from PIL import Image
+import io
+import os
 import re
 import urllib.parse
 import urllib.request
@@ -53,6 +56,7 @@ async def activate(request, activation_key):
 
 @app.route('/avatar/<penguin_id>', methods=["GET"])
 async def avatar(request, penguin_id):
+    size = 120
     await db.set_bind(
         f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
     if not penguin_id.isdigit():
@@ -62,9 +66,16 @@ async def avatar(request, penguin_id):
     if not user_count:
         return response.text('This penguin ID does not exist')
 
-    items = await Penguin.select('color', 'head', 'face', 'neck', 'body', 'hand', 'feet', 'photo', 'flag').where(Penguin.id == penguin_id).gino.first()
-
-    return response.text(items)
+    data_items = await Penguin.select('color', 'head', 'face', 'neck', 'body', 'hand', 'feet', 'photo', 'flag').where(Penguin.id == penguin_id).gino.first()
+    penguin_items = []
+    for item in data_items:
+        if item is None:
+            penguin_items.append(0)
+        else:
+            penguin_items.append(item)
+    items = initialize_image(list(map(int, penguin_items)), size)
+    build_avatar(items, penguin_id)
+    return await response.file(f"Avatar/penguin/{penguin_id}.png")
 
 
 async def handle_activation(data):
@@ -190,6 +201,51 @@ async def validate_password_email(request, response, lang):
         await ActivationKey.create(penguin_id=data.id, activation_key=activation_key)
 
     return response.text(build_query({'success': 1}))
+
+
+def download_image(image, size=120):
+    path = f"http://icer.ink/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{image}.png"
+    result = urllib.request.Request(
+        path,
+        data=None,
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+        }
+    )
+
+    image_p = f"Avatar/paper/{size}/{image}.png"
+    p = '/'.join(image_p.split('/')[:-1])
+    if not os.path.exists(p):
+        os.makedirs(p)
+    with urllib.request.urlopen(result) as f:
+        b = io.BytesIO(f.read())
+        image = Image.open(b)
+        image.save(image_p)
+
+    return image
+
+
+def build_avatar(images, penguin_id):
+    image_p = f"Avatar/penguin/{penguin_id}.png"
+    avatar_ = images[0]
+    for i in images[1:]:
+        avatar_.paste(i, (0, 0), i)
+    avatar_.save(image_p)
+
+
+def initialize_image(items, size=120):
+    sprites = list()
+    for i in items:
+        if i == 0:
+            sprites.append(Image.new('RGBA', (size, size), (0, 0, 0, 0,)))
+            continue
+        if not os.path.exists(f"Avatar/paper{size}/{i}"):
+            sprites.append(download_image(i, size))
+        else:
+            sprite = Image.open(f"Avatar/paper{size}/{i}")
+            sprites.append(sprite)
+
+    return sprites
 
 
 def generate_random_key():
