@@ -9,7 +9,7 @@ Dash was created to emulate the built in registration system in the CP client, w
 
 NOTE: Credit to Dote for parts of his Avatar API
 
-`location /create_account/create_account.php {
+       `location /create_account/create_account.php {
             proxy_pass http://127.0.0.1:3000/create_account;
             proxy_redirect off;
             proxy_set_header Host $host;
@@ -17,7 +17,7 @@ NOTE: Credit to Dote for parts of his Avatar API
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }`
 
-`location /activation {
+        `location /activation {
             proxy_pass http://127.0.0.1:3000/activation;
             proxy_redirect off;
             proxy_set_header Host $host;
