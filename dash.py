@@ -25,7 +25,7 @@ if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
     for email in white_list:
         config['EmailWhiteList'].append(str(email))
 
-app = Sanic()
+app = Sanic(name='Dash')
 
 
 @app.route('/create_account', methods=["POST"])
@@ -363,6 +363,6 @@ localization = {
         }
 }
 
-
-app.run(host='127.0.0.1', port=config['port'])
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=config['port'])
 
