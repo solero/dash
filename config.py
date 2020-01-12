@@ -21,5 +21,6 @@ config = {
     'approve': False,
     'sendgrid_api_key': '',
     'hostname': 'houdi.ni',
-    'external': 'http://play.houdi.ni'
+    'external': 'http://play.houdi.ni',
+    'avatar_size': 120
 }

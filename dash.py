@@ -5,7 +5,7 @@ from config import config
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from PIL import Image
-import io
+from os import makedirs
 import os
 import re
 import urllib.parse
@@ -16,7 +16,6 @@ import string
 import hashlib
 import bcrypt
 
-
 if config['email_white_list'] and isinstance(config['email_white_list'], str):
     email_list = open(config['email_white_list'], 'r')
     white_list = email_list.readlines()
@@ -24,6 +23,18 @@ if config['email_white_list'] and isinstance(config['email_white_list'], str):
     config['email_white_list'] = []
     for email in white_list:
         config['email_white_list'].append(str(email))
+
+
+if not os.path.isdir(f"./items/{config['avatar_size']}"):
+    os.makedirs(f"./items/{config['avatar_size']}")
+
+if not os.path.isdir('./avatars'):
+    os.makedirs('./avatars')
+
+
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]
+urllib.request.install_opener(opener)
 
 app = Sanic(name='Dash')
 
@@ -56,7 +67,6 @@ async def activate(request, activation_key):
 
 @app.route('/avatar/<penguin_id>', methods=["GET"])
 async def avatar(request, penguin_id):
-    size = 120
     await db.set_bind(
         f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
     if not penguin_id.isdigit():
@@ -66,16 +76,22 @@ async def avatar(request, penguin_id):
     if not user_count:
         return response.text('This penguin ID does not exist')
 
-    data_items = await Penguin.select('color', 'head', 'face', 'neck', 'body', 'hand', 'feet', 'photo', 'flag').where(Penguin.id == penguin_id).gino.first()
-    penguin_items = []
-    for item in data_items:
-        if item is None:
-            penguin_items.append(0)
-        else:
-            penguin_items.append(item)
-    items = initialize_image(list(map(int, penguin_items)), size)
-    build_avatar(items, penguin_id)
-    return await response.file(f"Avatar/penguin/{penguin_id}.png")
+    data_items = await Penguin.select('photo', 'flag', 'color', 'head', 'face', 'body',  'neck', 'hand', 'feet').where(Penguin.id == penguin_id).gino.first()
+    build_avatar(data_items, penguin_id)
+    return await response.file(f"avatars/{penguin_id}.png")
+
+
+def build_avatar(items, id):
+    avatar_image = Image.new('RGBA', (config['avatar_size'],config['avatar_size']), (0, 0, 0, 0))
+    for item in items:
+        if item is not None:
+            if not os.path.isfile(f"./items/{config['avatar_size']}/{item}.png"):
+                urllib.request.urlretrieve(f"https://icer.ink/mobcdn.clubpenguin.com/game/items/images/paper/image/{config['avatar_size']}/{item}.png", f"./items/{config['avatar_size']}/{item}.png")
+
+            item_image = Image.open(f"./items/{config['avatar_size']}/{item}.png", 'r')
+            avatar_image.paste(item_image, (0, 0), item_image)
+
+    avatar_image.save(f"./avatars/{id}.png")
 
 
 async def handle_activation(data):
@@ -131,7 +147,7 @@ async def validate_username(response, lang):
             build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
 
     username = username[0]
-    global session
+    global session # TODO: change to sessions object saved in file
     session = {'sid': secrets.token_urlsafe(16),
                'username': username[0].lower() + username[1:] if config['forced_case'] else username, 'color': color}
     return response.text(build_query({'success': 1, "sid": session['sid']}))
@@ -201,51 +217,6 @@ async def validate_password_email(request, response, lang):
         await ActivationKey.create(penguin_id=data.id, activation_key=activation_key)
 
     return response.text(build_query({'success': 1}))
-
-
-def download_image(image, size=120):
-    path = f"http://icer.ink/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{image}.png"
-    result = urllib.request.Request(
-        path,
-        data=None,
-        headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-        }
-    )
-
-    image_p = f"Avatar/paper/{size}/{image}.png"
-    p = '/'.join(image_p.split('/')[:-1])
-    if not os.path.exists(p):
-        os.makedirs(p)
-    with urllib.request.urlopen(result) as f:
-        b = io.BytesIO(f.read())
-        image = Image.open(b)
-        image.save(image_p)
-
-    return image
-
-
-def build_avatar(images, penguin_id):
-    image_p = f"Avatar/penguin/{penguin_id}.png"
-    avatar_ = images[0]
-    for i in images[1:]:
-        avatar_.paste(i, (0, 0), i)
-    avatar_.save(image_p)
-
-
-def initialize_image(items, size=120):
-    sprites = list()
-    for i in items:
-        if i == 0:
-            sprites.append(Image.new('RGBA', (size, size), (0, 0, 0, 0,)))
-            continue
-        if not os.path.exists(f"Avatar/paper{size}/{i}"):
-            sprites.append(download_image(i, size))
-        else:
-            sprite = Image.open(f"Avatar/paper{size}/{i}")
-            sprites.append(sprite)
-
-    return sprites
 
 
 def generate_random_key():
