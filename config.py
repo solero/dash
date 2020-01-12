@@ -5,21 +5,21 @@ config = {
     'email_regex': re.compile(r"[^@]+@[^@]+\.[^@]+"),
     'port': 3000,
     'database': {
-        'Address': 'localhost',
-        'Username': 'postgres',
-        'Password': 'password',
-        'Name': 'houdini'
+        'host': 'localhost',
+        'username': 'postgres',
+        'password': 'password',
+        'name': 'houdini'
     },
-    'ForcedCase': True,
-    'CloudFlare': False,
-    'SecretKey': '',
-    # 'EmailWhiteList': ["gmail.com", "hotmail.com"],
-    # 'EmailWhiteList': '/path/to/whitelist',
-    'EmailWhiteList': '',
-    'MaxPerEmail': 5,
-    'Activate': False,
-    'Approve': False,
-    'SendGridAPIKey': '',
-    'Hostname': 'play.houdi.ni',
-    'External': 'http://play.houdi.ni'
+    'forced_case': True,
+    'cloudflare': False,
+    'secret_key': '',
+    # 'email_white_list': ["gmail.com", "hotmail.com"],
+    # 'email_white_list': '/path/to/whitelist',
+    'email_white_list': '',
+    'max_per_email': 5,
+    'activate': False,
+    'approve': False,
+    'sendgrid_api_key': '',
+    'hostname': 'houdi.ni',
+    'external': 'http://play.houdi.ni'
 }

@@ -17,13 +17,13 @@ import hashlib
 import bcrypt
 
 
-if config['EmailWhiteList'] and isinstance(config['EmailWhiteList'], str):
-    email_list = open(config['EmailWhiteList'], 'r')
+if config['email_white_list'] and isinstance(config['email_white_list'], str):
+    email_list = open(config['email_white_list'], 'r')
     white_list = email_list.readlines()
     email_list.close()
-    config['EmailWhiteList'] = []
+    config['email_white_list'] = []
     for email in white_list:
-        config['EmailWhiteList'].append(str(email))
+        config['email_white_list'].append(str(email))
 
 app = Sanic(name='Dash')
 
@@ -46,7 +46,7 @@ async def register(request):
 @app.route('/activation/<activation_key>', methods=["GET"])
 async def activate(request, activation_key):
     await db.set_bind(
-        f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
+        f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
     data = await ActivationKey.query.where(ActivationKey.activation_key == activation_key).gino.first()
     if data is not None:
         return await handle_activation(data)
@@ -58,7 +58,7 @@ async def activate(request, activation_key):
 async def avatar(request, penguin_id):
     size = 120
     await db.set_bind(
-        f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
+        f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
     if not penguin_id.isdigit():
         return response.text('Penguin ID is not a digit')
     penguin_id = int(penguin_id)
@@ -114,7 +114,7 @@ async def validate_username(response, lang):
     elif not color.isdigit() or int(color) not in range(1, 15):
         return response.text(build_query({'error': ''}))
 
-    await db.set_bind(f"postgresql://{config['database']['Username']}:{config['database']['Password']}@{config['database']['Address']}/{config['database']['Name']}")
+    await db.set_bind(f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
 
     user_count = await username_count(username[0])
     if user_count:
@@ -133,7 +133,7 @@ async def validate_username(response, lang):
     username = username[0]
     global session
     session = {'sid': secrets.token_urlsafe(16),
-               'username': username[0].lower() + username[1:] if config['ForcedCase'] else username, 'color': color}
+               'username': username[0].lower() + username[1:] if config['forced_case'] else username, 'color': color}
     return response.text(build_query({'success': 1, "sid": session['sid']}))
 
 
@@ -144,18 +144,18 @@ async def validate_password_email(request, response, lang):
     password = attempt_data_retrieval('password')
     password_confirm = attempt_data_retrieval('password_confirm')
     email = attempt_data_retrieval('email')
-    if config['SecretKey']:
+    if config['secret_key']:
         g_token = attempt_data_retrieval('gtoken')[0]
-        ip = request.headers.get('cf-connecting-ip') if config['CloudFlare'] else request.headers.get(
+        ip = request.headers.get('cf-connecting-ip') if config['cloudflare'] else request.headers.get(
             'x-forwarded-for')
-        url = f"https://www.google.com/recaptcha/api/siteverify?secret={config['SecretKey']}&response={g_token}&remoteip={ip}"
+        url = f"https://www.google.com/recaptcha/api/siteverify?secret={config['secret_key']}&response={g_token}&remoteip={ip}"
         result = urllib.request.urlopen(url)
         captcha = json.loads(result.read().decode('utf-8'))
 
     if session_id != session['sid']:
         return response.text(build_query({'error': localization[lang]['passwords_match']}))
 
-    elif not captcha['success'] and config['SecretKey']:
+    elif not captcha['success'] and config['secret_key']:
         return response.text(build_query({'error': ''}))
 
     elif str(password[0]) != str(password_confirm[0]):
@@ -170,14 +170,14 @@ async def validate_password_email(request, response, lang):
     elif not config['email_regex'].match(email[0]):
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
-    elif email[0].split('@')[1] not in str(config['EmailWhiteList']) and not isinstance(config['EmailWhiteList'], str):
+    elif email[0].split('@')[1] not in str(config['email_white_list']) and not isinstance(config['email_white_list'], str):
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
     elif await email_count(email[0]):
         return response.text(build_query({'error': localization[lang]['email_invalid']}))
 
-    approve = False if config['Approve'] else True
-    activate = False if config['Activate'] else True
+    approve = False if config['approve'] else True
+    activate = False if config['activate'] else True
     password = generate_bcrypt(password[0]).decode('UTF-8')
     await Penguin.create(username=username, nickname=username, password=password, approval_en=approve,
                          approval_pt=approve, approval_fr=approve, approval_es=approve,
@@ -187,16 +187,16 @@ async def validate_password_email(request, response, lang):
     await PenguinItem.create(penguin_id=data.id, item_id=int(color))
     await PenguinPostcard.create(penguin_id=data.id, sender_id=None, postcard_id=125)
 
-    if config['Activate']:
+    if config['activate']:
         activation_key = secrets.token_urlsafe(45)
-        link = f"{config['External']}/activation/{activation_key}"
+        link = f"{config['external']}/activation/{activation_key}"
         message = Mail(
-            from_email=f"noreply@{config['Hostname']}",
+            from_email=f"noreply@{config['hostname']}",
             to_emails=email[0],
             subject='Activate your penguin!',
-            html_content=f"<p>Hello,</p> <p>Thank you for creating a penguin on {config['Hostname']}. Please click below to activate your penguin account.</p> <a href='{link}'>Activate</a>"
+            html_content=f"<p>Hello,</p> <p>Thank you for creating a penguin on {config['hostname']}. Please click below to activate your penguin account.</p> <a href='{link}'>Activate</a>"
         )
-        sg = SendGridAPIClient(f"{config['SendGridAPIKey']}")
+        sg = SendGridAPIClient(f"{config['sendgrid_api_key']}")
         sg.send(message)
         await ActivationKey.create(penguin_id=data.id, activation_key=activation_key)
 
@@ -267,7 +267,7 @@ async def id_count(value):
 async def email_count(value):
     email_count = await db.select([db.func.count(Penguin.email)]).where(
         db.func.lower(Penguin.email) == value.lower()).gino.scalar()
-    return email_count >= config['MaxPerEmail']
+    return email_count >= config['max_per_email']
 
 
 def hash(undigested):
