@@ -17,22 +17,21 @@ import bcrypt
 import asyncio
 
 app = Sanic(name='Dash')
+sessions = {}
 
 
 @app.route('/create_account', methods=["POST"])
 async def register(request):
     query_string = request.body.decode('UTF-8')
-    global post_data
-    # TODO: pass through function
     post_data = parse_qs(query_string)
-    action = attempt_data_retrieval('action')[0]
-    lang = attempt_data_retrieval('lang')[0]
+    action = attempt_data_retrieval('action', post_data)[0]
+    lang = attempt_data_retrieval('lang', post_data)[0]
     if action == 'validate_agreement':
-        return validate_agreement(response, lang)
+        return validate_agreement(response, lang, post_data)
     elif action == 'validate_username':
-        return await validate_username(response, lang)
+        return await validate_username(response, lang, post_data)
     elif action == 'validate_password_email':
-        return await validate_password_email(request, response, lang)
+        return await validate_password_email(request, response, lang, post_data)
 
 
 @app.route('/activation/<activation_key>', methods=["GET"])
@@ -107,17 +106,17 @@ def build_avatar(items, id):
     avatar_image.save(f"./avatars/{id}.png")
 
 
-def validate_agreement(response, lang):
-    agree_terms = int(attempt_data_retrieval('agree_to_terms')[0])
-    agree_rules = int(attempt_data_retrieval('agree_to_rules')[0])
+def validate_agreement(response, lang, post_data):
+    agree_terms = int(attempt_data_retrieval('agree_to_terms', post_data)[0])
+    agree_rules = int(attempt_data_retrieval('agree_to_rules', post_data)[0])
     if not agree_terms or not agree_rules:
         return response.text(build_query({'error': localization[lang]['terms']}))
     return response.text(build_query({'success': 1}))
 
 
-async def validate_username(response, lang):
-    username = attempt_data_retrieval('username')
-    color = attempt_data_retrieval("colour")[0]
+async def validate_username(response, lang, post_data):
+    username = attempt_data_retrieval('username', post_data)
+    color = attempt_data_retrieval('colour', post_data)[0]
     if not username:
         return response.text(build_query({'error': localization[lang]['name_missing']}))
 
@@ -133,7 +132,7 @@ async def validate_username(response, lang):
     elif not config["allowed_chars"].match(username[0]):
         return response.text(build_query({'error': localization[lang]['name_not_allowed']}))
 
-    elif not color.isdigit() or int(color) not in range(1, 15):
+    elif not color.isdigit() or int(color) not in range(1, 16):
         return response.text(build_query({'error': ''}))
 
     user_count = await username_count(username[0])
@@ -151,28 +150,34 @@ async def validate_username(response, lang):
             build_query({'error': localization[lang]['name_suggest'].replace('[suggestion]', suggestion)}))
 
     username = username[0]
-    global session # TODO: change to sessions object saved in file
-    session = {'sid': secrets.token_urlsafe(16),
+
+    session_details = {'sid': secrets.token_urlsafe(16),
                'username': username[0].lower() + username[1:] if config['forced_case'] else username, 'color': color}
-    return response.text(build_query({'success': 1, "sid": session['sid']}))
+
+    sessions[session_details['sid']] = session_details
+    return response.text(build_query({'success': 1, "sid": session_details['sid']}))
 
 
-async def validate_password_email(request, response, lang):
-    session_id = attempt_data_retrieval("sid", True)
-    username = attempt_data_retrieval("username", True)
-    color = attempt_data_retrieval("color", True)
-    password = attempt_data_retrieval('password')
-    password_confirm = attempt_data_retrieval('password_confirm')
-    email = attempt_data_retrieval('email')
+async def validate_password_email(request, response, lang, post_data):
+    session_id = attempt_data_retrieval("sid", post_data)[0]
+    session = attempt_data_retrieval(session_id, sessions) if len(sessions) else None
+    username = attempt_data_retrieval('username', session) if session else None
+    color = attempt_data_retrieval('color', session) if session else None
+    password = attempt_data_retrieval('password', post_data)
+    password_confirm = attempt_data_retrieval('password_confirm', post_data)
+    email = attempt_data_retrieval('email', post_data)
     if config['secret_key']:
-        g_token = attempt_data_retrieval('gtoken')[0]
+        g_token = attempt_data_retrieval('gtoken', post_data)[0]
         ip = request.headers.get('cf-connecting-ip') if config['cloudflare'] else request.headers.get(
             'x-forwarded-for')
         url = f"https://www.google.com/recaptcha/api/siteverify?secret={config['secret_key']}&response={g_token}&remoteip={ip}"
         result = urllib.request.urlopen(url)
         captcha = json.loads(result.read().decode('utf-8'))
 
-    if session_id != session['sid']:
+    if session is None or username is None or color is None:
+        return response.text(build_query({'error': localization[lang]['passwords_match']}))
+
+    elif session_id != session['sid']:
         return response.text(build_query({'error': localization[lang]['passwords_match']}))
 
     elif not captcha['success'] and config['secret_key']:
@@ -268,12 +273,9 @@ def generate_bcrypt(password):
     return bcrypt.hashpw(hash.encode('utf-8'), bcrypt.gensalt(12))
 
 
-def attempt_data_retrieval(key, session_retrieval=False):
-    if not session_retrieval and key in post_data.keys():
-        return post_data[key]
-
-    if session_retrieval and key in session.keys():
-        return session[key]
+def attempt_data_retrieval(key, data):
+    if key in data.keys():
+        return data[key]
 
 
 def build_query(data):
