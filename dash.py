@@ -5,7 +5,6 @@ from config import config
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from PIL import Image
-from os import makedirs
 import os
 import re
 import urllib.parse
@@ -15,26 +14,7 @@ import json
 import string
 import hashlib
 import bcrypt
-
-if config['email_white_list'] and isinstance(config['email_white_list'], str):
-    email_list = open(config['email_white_list'], 'r')
-    white_list = email_list.readlines()
-    email_list.close()
-    config['email_white_list'] = []
-    for email in white_list:
-        config['email_white_list'].append(str(email))
-
-
-if not os.path.isdir(f"./items/{config['avatar_size']}"):
-    os.makedirs(f"./items/{config['avatar_size']}")
-
-if not os.path.isdir('./avatars'):
-    os.makedirs('./avatars')
-
-
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]
-urllib.request.install_opener(opener)
+import asyncio
 
 app = Sanic(name='Dash')
 
@@ -43,6 +23,7 @@ app = Sanic(name='Dash')
 async def register(request):
     query_string = request.body.decode('UTF-8')
     global post_data
+    # TODO: pass through function
     post_data = parse_qs(query_string)
     action = attempt_data_retrieval('action')[0]
     lang = attempt_data_retrieval('lang')[0]
@@ -56,19 +37,18 @@ async def register(request):
 
 @app.route('/activation/<activation_key>', methods=["GET"])
 async def activate(request, activation_key):
-    await db.set_bind(
-        f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
     data = await ActivationKey.query.where(ActivationKey.activation_key == activation_key).gino.first()
     if data is not None:
-        return await handle_activation(data)
-
-    return response.text('Activation key was not found in our records.')
+        await Penguin.update.values(active=True) \
+            .where(Penguin.id == data.penguin_id).gino.status()
+        await ActivationKey.delete.where((ActivationKey.penguin_id == data.penguin_id)).gino.status()
+        return response.text('Activated penguin, you may now login.')
+    else:
+        return response.text('Activation key was not found in our records.')
 
 
 @app.route('/avatar/<penguin_id>', methods=["GET"])
 async def avatar(request, penguin_id):
-    await db.set_bind(
-        f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
     if not penguin_id.isdigit():
         return response.text('Penguin ID is not a digit')
     penguin_id = int(penguin_id)
@@ -79,6 +59,39 @@ async def avatar(request, penguin_id):
     data_items = await Penguin.select('photo', 'flag', 'color', 'head', 'face', 'body',  'neck', 'hand', 'feet').where(Penguin.id == penguin_id).gino.first()
     build_avatar(data_items, penguin_id)
     return await response.file(f"avatars/{penguin_id}.png")
+
+
+async def main():
+    if config['email_white_list'] and isinstance(config['email_white_list'], str):
+        email_list = open(config['email_white_list'], 'r')
+        white_list = email_list.readlines()
+        email_list.close()
+        config['email_white_list'] = []
+        for email in white_list:
+            config['email_white_list'].append(str(email))
+
+    if not os.path.isdir(f"./items/{config['avatar_size']}"):
+        os.makedirs(f"./items/{config['avatar_size']}")
+
+    if not os.path.isdir('./avatars'):
+        os.makedirs('./avatars')
+
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-agent',
+                          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]
+    urllib.request.install_opener(opener)
+
+    await db.set_bind(f"postgresql://"
+                      f"{config['database']['username']}:"
+                      f"{config['database']['password']}@"
+                      f"{config['database']['host']}/"
+                      f"{config['database']['name']}")
+    aio_server = await app.create_server(
+        host='127.0.0.1', port=config['port'],
+        return_asyncio_server=True,
+        asyncio_server_kwargs=dict(start_serving=False),
+    )
+    await aio_server.server.serve_forever()
 
 
 def build_avatar(items, id):
@@ -92,13 +105,6 @@ def build_avatar(items, id):
             avatar_image.paste(item_image, (0, 0), item_image)
 
     avatar_image.save(f"./avatars/{id}.png")
-
-
-async def handle_activation(data):
-    await Penguin.update.values(active=True) \
-        .where(Penguin.id == data.penguin_id).gino.status()
-    await ActivationKey.delete.where((ActivationKey.penguin_id == data.penguin_id)).gino.status()
-    return response.text('Activated penguin, you may now login.')
 
 
 def validate_agreement(response, lang):
@@ -129,8 +135,6 @@ async def validate_username(response, lang):
 
     elif not color.isdigit() or int(color) not in range(1, 15):
         return response.text(build_query({'error': ''}))
-
-    await db.set_bind(f"postgresql://{config['database']['username']}:{config['database']['password']}@{config['database']['host']}/{config['database']['name']}")
 
     user_count = await username_count(username[0])
     if user_count:
@@ -225,20 +229,20 @@ def generate_random_key():
 
 
 async def username_count(value):
-    user_count = await db.select([db.func.count(Penguin.username)]).where(
+    count = await db.select([db.func.count(Penguin.username)]).where(
         db.func.lower(Penguin.username) == value.lower()).gino.scalar()
-    return user_count >= 1
+    return count >= 1
 
 
 async def id_count(value):
-    user_count = await db.select([db.func.count(Penguin.id)]).where(Penguin.id == value).gino.scalar()
-    return user_count >= 1
+    count = await db.select([db.func.count(Penguin.id)]).where(Penguin.id == value).gino.scalar()
+    return count >= 1
 
 
 async def email_count(value):
-    email_count = await db.select([db.func.count(Penguin.email)]).where(
+    count = await db.select([db.func.count(Penguin.email)]).where(
         db.func.lower(Penguin.email) == value.lower()).gino.scalar()
-    return email_count >= config['max_per_email']
+    return count >= config['max_per_email']
 
 
 def hash(undigested):
@@ -335,5 +339,7 @@ localization = {
 }
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=config['port'])
-
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print('Shutting down...')
