@@ -1,3 +1,5 @@
 sanic
 sendgrid
 bcrypt
+gino
+pillow
