@@ -1,5 +1,10 @@
+fast-autocomplete
+aiohttp
 sanic
+sanic_session
 sendgrid
 bcrypt
 gino
+Jinja2
 pillow
+python-i18n[YAML]
