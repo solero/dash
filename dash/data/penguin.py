@@ -1,6 +1,4 @@
-
-from gino import Gino
-db = Gino()
+from dash.data import db
 
 
 class Penguin(db.Model):
@@ -41,6 +39,7 @@ class Penguin(db.Model):
     career_medals = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
     agent_medals = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
     last_field_op = db.Column(db.DateTime, nullable=False, server_default=db.text("now()"))
+    com_message_read_date = db.Column(db.DateTime, nullable=False, server_default=db.text("now()"))
     ninja_rank = db.Column(db.SmallInteger, nullable=False, server_default=db.text("0"))
     ninja_progress = db.Column(db.SmallInteger, nullable=False, server_default=db.text("0"))
     fire_ninja_rank = db.Column(db.SmallInteger, nullable=False, server_default=db.text("0"))
@@ -50,9 +49,11 @@ class Penguin(db.Model):
     ninja_matches_won = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
     fire_matches_won = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
     water_matches_won = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
-    rainbow_adoptability = db.Column(db.SmallInteger, nullable=False, server_default=db.text("0"))
+    rainbow_adoptability = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     has_dug = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
+    puffle_handler = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     nuggets = db.Column(db.SmallInteger, nullable=False, server_default=db.text("0"))
+    walking = db.Column(db.ForeignKey('penguin_puffle.id', ondelete='CASCADE', onupdate='CASCADE'))
     opened_playercard = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     special_wave = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     special_dance = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
@@ -62,6 +63,8 @@ class Penguin(db.Model):
     timer_active = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     timer_start = db.Column(db.Time, nullable=False, server_default=db.text("'00:00:00'::time without time zone"))
     timer_end = db.Column(db.Time, nullable=False, server_default=db.text("'23:59:59'::time without time zone"))
+    timer_total = db.Column(db.Interval, nullable=False, server_default=db.text("'01:00:00'::interval"))
+    grounded = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     approval_en = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     approval_pt = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
     approval_fr = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
@@ -76,36 +79,9 @@ class Penguin(db.Model):
     rejection_ru = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
 
 
-class PenguinPostcard(db.Model):
-    __tablename__ = 'penguin_postcard'
-
-    id = db.Column(db.Integer, primary_key=True,
-                   server_default=db.text("nextval('\"penguin_postcard_id_seq\"'::regclass)"))
-    penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False,
-                           index=True)
-    sender_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), index=True)
-    postcard_id = db.Column(db.ForeignKey('postcard.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
-    send_date = db.Column(db.DateTime, nullable=False, server_default=db.text("now()"))
-    details = db.Column(db.String(255), nullable=False, server_default=db.text("''::character varying"))
-    has_read = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
-
-
-class PenguinItem(db.Model):
-    __tablename__ = 'penguin_item'
-
-    penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'),
-                           primary_key=True, nullable=False)
-    item_id = db.Column(db.ForeignKey('item.id', ondelete='CASCADE', onupdate='CASCADE'),
-                        primary_key=True, nullable=False)
-
-
 class ActivationKey(db.Model):
     __tablename__ = 'activation_key'
 
     penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True,
                            nullable=False)
     activation_key = db.Column(db.CHAR(255), primary_key=True, nullable=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
