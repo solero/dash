@@ -1,0 +1,12 @@
+en:
+  terms: You must agree to the Rules and Terms of Use.
+  name_missing: You need to name your penguin.
+  name_short: Penguin name is too short.
+  name_number: Penguin names can only contain 5 numbers.
+  name_letter: Penguin names must contain at least 1 letter.
+  name_not_allowed: That penguin name is not allowed.
+  name_taken: That penguin name is already taken.
+  name_suggest: That penguin name is already taken. Try %{suggestion}.
+  passwords_match: Passwords do not match.
+  password_short: Password is too short.
+  email_invalid: Invalid email address.

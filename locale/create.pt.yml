@@ -1,0 +1,12 @@
+pt:
+  terms: Você precisa concordar com as Regras e com os Termos de Uso.
+  name_missing: Você precisa nomear seu pinguim.
+  name_short: O nome do pinguim é muito curto.
+  name_number: O nome do pinguim só pode conter 5 números.
+  name_letter: O nome do seu pinguim tem de conter pelo menos uma letra.
+  name_not_allowed: Esse nome de pinguim não é permitido.
+  name_taken: Esse nome de pinguim já foi escolhido.
+  name_suggest: Esse nome de pinguim já foi escolhido. Tente %{suggestion}.
+  passwords_match: As senhas não correspondem.
+  password_short: A senha é muito curta.
+  email_invalid: Esse endereço de E-Mail é invalido.

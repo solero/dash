@@ -1,0 +1,12 @@
+fr:
+  terms: Tu dois accepter les conditions d'utilisation.
+  name_missing: Tu dois donner un nom à ton pingouin.
+  name_short: Le nom de pingouin est trop court.
+  name_number: Un nom de pingouin ne peut contenir plus de 5 nombres.
+  name_letter: Un nom de pingouin doit contenir au moins une lettre.
+  name_not_allowed: Ce nom de pingouin n'est pas autorisé.
+  name_taken: Ce nom de pingouin est pris.
+  name_suggest: Ce nom de pingouin est pris. Essaye %{suggestion}.
+  passwords_match: Les mots de passes ne correspondent pas.
+  password_short: Le mot de passe est trop court.
+  email_invalid: Adresse email invalide.
