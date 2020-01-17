@@ -1,34 +1,96 @@
-# Dash
+<p align="center">
+   <img alt="dash" src="https://user-images.githubusercontent.com/32749673/72632476-3e14bc00-394e-11ea-87e3-be09d8e40909.png">
+</p>
 
-A simple web system/API for houdini-asyncio's registration and avatar generation.
+#
 
-# Setup
+<p align="center">
+  <a href="https://discord.gg/UPnWKfh">
+    <img
+      alt="Solero Discord"
+      src="https://img.shields.io/discord/323290581063172096?color=7289DA&label=discord"
+    />
+  </a>
+  <a href="https://solero.me">
+    <img
+      alt="Solero Forum"
+      src="https://img.shields.io/discourse/https/solero.me/topics?color=73afb6"
+    />
+  </a>
+  <a href="https://github.com/Solero/Houdini-asyncio/issues">
+    <img
+      alt="Issue Tracker"
+      src="https://img.shields.io/github/issues/solero/dash"
+    />
+  </a>
+  <a href="./LICENSE">
+    <img
+      alt="License"
+      src="https://img.shields.io/github/license/solero/dash"
+    />
+  </a>
+</p>
 
-Dash was created to emulate the built in registration system in the CP client, which by default sends and receives data from the file create_account.php which is loaded from the play sub domain. For Dash to send and receive this data, you will want to edit your current play sub domain configuration, keep everything how it is but just add the following blocks:
+<p align="center">A server for Houdini web-services.</p>
 
+## Features
+- Avatar API for igloo likes and friends lists.
+- Endpoint for the legacy flash "Create a penguin".
+- Auto-complete API for phrase-chat autocomplete.
+- Penguin activation via register*
+- Provides API for password resets.
+- Highly configurable!
 
-       location /create_account/create_account.php {
-            proxy_pass http://127.0.0.1:3000/create_account;
-            proxy_redirect off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
+**Requires SendGrid API key*
 
-        location /activation {
-            proxy_pass http://127.0.0.1:3000/activation;
-            proxy_redirect off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
+## Installation
 
-        location /avatar {
-            proxy_pass http://127.0.0.1:3000/avatar;
-            proxy_redirect off;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
+Dash provides only very simple routes, for this reason, 
+some web server trickery is required to register the routes
+required by the Club Penguin client. 
 
-Edit config.py, if you wish to utilize the 'activate an account' feature, Dash will use SendGrid's API for that, which means you require a SendGrid API key in order to send mail to users who register. Just sign up and fetch one, add it to config.py as well as setting `Activation` to `true`.
+Sample for nginx config:
+
+```conf
+# server_name play.clubpenguin.com
+location ~ ^/avatar/(.*)/cp$ {
+    proxy_pass http://dash/avatar/$1$is_args$args;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name media.clubpenguin.com
+location /social/autocomplete/v2/search/suggestions {
+    proxy_pass http://dash/autocomplete;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name play.clubpenguin.com
+location /create_account/create_account.php {
+    proxy_pass http://dash/create;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+```
+
+## Contributing
+
+:heartpulse: So glad to hear of your interest!
+
+If you have suggestions for how this project can be improved, or want to report a bug, please feel free to open an issue! We welcome any and all contributions. We listen to all your questions and are always active on the [Solero Discord server](https://solero.me/discord).
+
+## License
+
+MIT Licensed
