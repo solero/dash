@@ -153,11 +153,11 @@ async def validate_password_email(request, post_data):
 
     _, email = parseaddr(email)
     domain = email.rsplit('@', 1)[-1]
-    if not email:
+    if not email or '@' not in email:
         return response.text(urlencode({
             'error': i18n.t('create.email_invalid', lang=lang)
         }))
-    elif not app.config.EMAIL_WHITELIST or domain not in app.config.EMAIL_WHITELIST:
+    elif app.config.EMAIL_WHITELIST and domain not in app.config.EMAIL_WHITELIST:
         return response.text(urlencode({
             'error': i18n.t('create.email_invalid', lang=lang)
         }))
