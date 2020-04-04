@@ -169,8 +169,9 @@ async def validate_password_email(request, post_data):
             'error': i18n.t('create.email_invalid', lang=lang)
         }))
 
+    password = Crypto.hash(password).upper()
     password = Crypto.get_login_hash(password, rndk=app.config.STATIC_KEY)
-    password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12))
+    password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
 
     if app.config.USERNAME_FORCE_CASE:
         username = username.title()
