@@ -6,6 +6,7 @@ from dash.routes.autocomplete import autocomplete
 from dash.routes.create import create
 
 import i18n
+import os
 
 
 @app.listener('before_server_start')
@@ -18,7 +19,7 @@ async def connect_to_db(sanic, loop):
 
 
 def main(args):
-    i18n.load_path.append('./locale')
+    i18n.load_path.append(os.path.abspath('locale'))
 
     if args.config:
         app.config.from_pyfile(args.config)
