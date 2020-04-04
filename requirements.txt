@@ -7,4 +7,5 @@ bcrypt
 gino
 Jinja2
 pillow
+PyYAML
 python-i18n[YAML]
