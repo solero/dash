@@ -186,9 +186,8 @@ async def validate_password_email(request, post_data):
                                    approval_ru=app.config.APPROVE_USERNAME,
                                    active=app.config.ACTIVATE_PLAYER)
 
-    data = await Penguin.query.where(Penguin.username == username).gino.first()
-    await PenguinItem.create(penguin_id=data.id, item_id=int(color))
-    await PenguinPostcard.create(penguin_id=data.id, sender_id=None, postcard_id=125)
+    await PenguinItem.create(penguin_id=penguin.id, item_id=int(color))
+    await PenguinPostcard.create(penguin_id=penguin.id, sender_id=None, postcard_id=125)
 
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
@@ -203,6 +202,6 @@ async def validate_password_email(request, post_data):
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
         sg.send(message)
-        await ActivationKey.create(penguin_id=data.id, activation_key=activation_key)
+        await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
 
     return response.text(urlencode({'success': 1}))
