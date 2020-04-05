@@ -67,11 +67,14 @@ Player activation
 ACTIVATE_PLAYER : bool
     Activate player automatically so no email needs to be sent.
     Enabling this option requires a SendGrid API key.
+ACTIVATE_LINK : str
+    URL player is taken to for activation.
 ACTIVATE_REDIRECT : str
     URL to redirect to when player has activated their account
     via email.
 """
 ACTIVATE_PLAYER = True
+ACTIVATE_LINK = 'http://secure.clubpenguin.com/activate/'
 ACTIVATE_REDIRECT = ''
 
 """

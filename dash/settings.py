@@ -13,6 +13,7 @@ USERNAME_FORCE_CASE = True
 APPROVE_NICKNAME = False
 
 ACTIVATE_PLAYER = True
+ACTIVATE_LINK = 'http://secure.clubpenguin.com/activate/'
 ACTIVATE_REDIRECT = ''
 
 SITE_NAME = 'Houdini'
