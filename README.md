@@ -54,7 +54,7 @@ Sample for nginx config:
 ```conf
 # server_name play.clubpenguin.com
 location ~ ^/avatar/(.*)/cp$ {
-    proxy_pass http://dash/avatar/$1$is_args$args;
+    proxy_pass http://localhost:3000/avatar/$1$is_args$args;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -65,7 +65,7 @@ location ~ ^/avatar/(.*)/cp$ {
 
 # server_name media.clubpenguin.com
 location /social/autocomplete/v2/search/suggestions {
-    proxy_pass http://dash/autocomplete;
+    proxy_pass http://localhost:3000/autocomplete;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -76,7 +76,18 @@ location /social/autocomplete/v2/search/suggestions {
 
 # server_name play.clubpenguin.com
 location /create_account/create_account.php {
-    proxy_pass http://dash/create;
+    proxy_pass http://localhost:3000/create;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name play.clubpenguin.com
+location /create/activate {
+    proxy_pass http://localhost:3000/create/activate;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
