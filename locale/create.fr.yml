@@ -11,6 +11,7 @@ fr:
   passwords_match: Les mots de passes ne correspondent pas.
   password_short: Le mot de passe est trop court.
   email_invalid: Adresse email invalide.
+  activate_mail_subject: Activez votre compte.
   balloon: ballon
   cheese: fromage
   igloo: iglou

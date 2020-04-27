@@ -11,6 +11,7 @@ pt:
   passwords_match: As senhas não correspondem.
   password_short: A senha é muito curta.
   email_invalid: Esse endereço de E-Mail é invalido.
+  activate_mail_subject: Ative sua conta.
   balloon: balão
   cheese: queijo
   igloo: iglu

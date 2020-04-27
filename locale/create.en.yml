@@ -11,6 +11,7 @@ en:
   passwords_match: Passwords do not match.
   password_short: Password is too short.
   email_invalid: Invalid email address.
+  activate_mail_subject: Activate your account.
   balloon: balloon
   cheese: cheese
   igloo: igloo
