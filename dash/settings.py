@@ -26,4 +26,7 @@ MAX_ACCOUNT_EMAIL = 5
 
 STATIC_KEY = 'houdini'
 
+PLAY_SUBDOMAIN = 'http://play.clubpenguin.com'
+
+
 REAL_IP_HEADER = 'X-Real-IP'
