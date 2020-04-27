@@ -117,7 +117,7 @@ location /penguin/activate {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
 
-CardJutsuSnow (AS3):
+CardJitsuSnow (AS3):
 
 # server_name play.clubpenguin.com
 location ~ ^/(.*)/web-service/snfgenerator/session$ {
