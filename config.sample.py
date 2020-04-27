@@ -34,13 +34,19 @@ Google reCAPTCHA
 GCAPTCHA_URL : str
     Google captcha verify URL. Normally you do not need to
     modify this.
+
+GSITE_KEY : str
+    Your reCAPTCHA site key obtained from Google.
+
 GSECRET_KEY : str
     Your reCAPTCHA secret key obtained from Google.
+
     
 .. Google reCAPTCHA registration:
     https://www.google.com/recaptcha/admin/create
 """
 GCAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
+GSITE_KEY = ''
 GSECRET_KEY = ''
 
 """
