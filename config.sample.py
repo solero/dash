@@ -42,6 +42,7 @@ GSECRET_KEY : str
 """
 GCAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
 GSECRET_KEY = ''
+GSITE_KEY = ''
 
 """
 Player usernames
