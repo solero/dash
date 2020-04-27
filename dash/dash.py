@@ -5,8 +5,8 @@ from dash.routes.avatar import avatar
 from dash.routes.autocomplete import autocomplete
 from dash.routes.create.legacy import legacy_create, legacy_activate
 from dash.routes.create.vanilla import vanilla_create, vanilla_activate
-from dash.routes.session import session
-from dash.routes.swrequest import swrequest
+from dash.routes.snow.session import session
+from dash.routes.snow.swrequest import swrequest
 
 import i18n
 import os
