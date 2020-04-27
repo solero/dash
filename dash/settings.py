@@ -7,6 +7,7 @@ POSTGRES_USER = 'postgres'
 POSTGRES_PASSWORD = 'postgres'
 
 GCAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
+GSITE_KEY = ''
 GSECRET_KEY = ''
 
 USERNAME_FORCE_CASE = True
