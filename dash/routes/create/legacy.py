@@ -196,7 +196,7 @@ async def validate_password_email(request, post_data):
         mail_template = env.get_template('en_legacy_activation.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
-            subject=i18n.t('create.activate_mail_subject'),
+            subject=i18n.t('create.activate_mail_subject', locale=lang),
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
                 activate_link=app.config.ACTIVATE_LINK + activation_key
