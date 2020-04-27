@@ -68,14 +68,17 @@ Player activation
 ACTIVATE_PLAYER : bool
     Activate player automatically so no email needs to be sent.
     Enabling this option requires a SendGrid API key.
-ACTIVATE_LINK : str
+LEGACY_ACTIVATE_LINK : str
+    URL player is taken to for activation.
+VANILLA_ACTIVATE_LINK : str
     URL player is taken to for activation.
 ACTIVATE_REDIRECT : str
     URL to redirect to when player has activated their account
     via email.
 """
 ACTIVATE_PLAYER = True
-ACTIVATE_LINK = 'http://secure.clubpenguin.com/penguin/activate/'
+VANILLA_ACTIVATE_LINK = 'http://secure.clubpenguin.com/penguin/activate/'
+LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com/penguin/activate/'
 ACTIVATE_REDIRECT = ''
 
 """
