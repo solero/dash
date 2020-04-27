@@ -108,7 +108,7 @@ location /penguin/create {
 
 ...
 
-# server_name play.clubpenguin.com (AS3 sub-domain)
+ # server_name play.clubpenguin.com (AS3 sub-domain)
 location /penguin/activate {
     proxy_pass http://localhost:3000/activate/vanilla;
     proxy_redirect off;
@@ -116,6 +116,27 @@ location /penguin/activate {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
+
+CardJutsuSnow (AS3):
+
+# server_name play.clubpenguin.com
+location ~ ^/(.*)/web-service/snfgenerator/session$ {
+    proxy_pass http://localhost:3000/session;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+# server_name play.clubpenguin.com
+location /api/v0.2/xxx/game/get/world-name-service/start_world_request {
+    proxy_pass http://localhost:3000/swrequest;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
 
 ```
 

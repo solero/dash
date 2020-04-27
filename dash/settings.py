@@ -28,5 +28,7 @@ STATIC_KEY = 'houdini'
 
 PLAY_SUBDOMAIN = 'http://play.clubpenguin.com'
 
+CJS_HOST = "localhost"
+CJS_PORT = 7002
 
 REAL_IP_HEADER = 'X-Real-IP'
