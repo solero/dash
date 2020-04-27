@@ -199,7 +199,7 @@ async def validate_password_email(request, post_data):
             subject=i18n.t('create.activate_mail_subject', locale=lang),
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
-                activate_link=app.config.ACTIVATE_LINK + activation_key
+                activate_link=app.config.LEGACY_ACTIVATE_LINK + activation_key
             )
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)

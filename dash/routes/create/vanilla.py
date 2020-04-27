@@ -331,7 +331,7 @@ async def _validate_registration(request, post_data, lang):
                 penguin=penguin, site_name=app.config.SITE_NAME,
                 activation_code=activation_key,
                 play_subdomain=app.config.PLAY_SUBDOMAIN,
-                activate_link=app.config.ACTIVATE_LINK
+                activate_link=app.config.VANILLA_ACTIVATE_LINK
             )
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
