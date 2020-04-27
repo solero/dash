@@ -119,38 +119,41 @@ location /penguin/activate {
 
 CardJutsuSnow (AS3):
 
- # server_name play.clubpenguin.com
+# server_name play.clubpenguin.com
 location /en/web-service/snfgenerator/session {
 		proxy_pass http://localhost:3000/session;
 		proxy_redirect off;
 		proxy_set_header Host $host;
 		proxy_set_header X-Real-IP $remote_addr;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	}
- # server_name play.clubpenguin.com
+}
+
+# server_name play.clubpenguin.com
 location /pt/web-service/snfgenerator/session {
 		proxy_pass http://localhost:3000/session;
 		proxy_redirect off;
 		proxy_set_header Host $host;
 		proxy_set_header X-Real-IP $remote_addr;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	}
- # server_name play.clubpenguin.com
+}
+
+# server_name play.clubpenguin.com
 location /es/web-service/snfgenerator/session {
 		proxy_pass http://localhost:3000/session;
 		proxy_redirect off;
 		proxy_set_header Host $host;
 		proxy_set_header X-Real-IP $remote_addr;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	}
-	# server_name play.clubpenguin.com
+}
+
+# server_name play.clubpenguin.com
 location /api/v0.2/xxx/game/get/world-name-service/start_world_request {
 		proxy_pass http://localhost:3000/swrequest;
 		proxy_redirect off;
 		proxy_set_header Host $host;
 		proxy_set_header X-Real-IP $remote_addr;
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-	}
+}
 
 
 ```
