@@ -128,7 +128,7 @@ async def validate_password_email(request, post_data):
         }))
 
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = post_data.get('gtoken', [None])[0]
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
