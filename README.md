@@ -74,9 +74,32 @@ location /social/autocomplete/v2/search/suggestions {
 
 ...
 
-# server_name play.clubpenguin.com
+Legacy (AS2):
+
+# server_name play.clubpenguin.com (AS2 sub-domain)
 location /create_account/create_account.php {
-    proxy_pass http://localhost:3000/create;
+    proxy_pass http://localhost:3000/create/legacy;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+# server_name play.clubpenguin.com (AS2 sub-domain)
+location /penguin/activate {
+    proxy_pass http://localhost:3000/activate/legacy;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+
+Vanilla (AS3):
+
+# server_name play.clubpenguin.com (AS3 sub-domain)
+location /penguin/create {
+    proxy_pass http://localhost:3000/create/vanilla;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -85,9 +108,9 @@ location /create_account/create_account.php {
 
 ...
 
-# server_name play.clubpenguin.com
-location /create/activate {
-    proxy_pass http://localhost:3000/create/activate;
+# server_name play.clubpenguin.com (AS3 sub-domain)
+location /penguin/activate {
+    proxy_pass http://localhost:3000/activate/vanilla;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -95,6 +118,49 @@ location /create/activate {
 }
 
 ```
+
+Dash can be setup as shown:
+
+```shell
+$ git clone https://github.com/solero/dash
+$ cd dash
+$ pip install -r requirements.txt
+$ python bootstrap.py -c config.sample.py
+```
+
+Recaptcha:
+
+To protect your register from bots, your register will require a captcha. The register is built to work with recaptcha v3's API so you will be required to get a pair of recaptcha v3 keys from here:  https://www.google.com/recaptcha/admin/create.
+
+If you are using the legacy (AS2) client for registration, you must add the following HTML embed to your play page in order for the captcha to work with the client. 
+
+```conf
+<style type="text/css">
+  .grecaptcha-badge {
+  display: none;
+  }
+</style>
+<script src="https://www.google.com/recaptcha/api.js?render=SITE_KEY_GOES_HERE"></script>
+<script type="text/javascript">
+  function onSubmit(){
+    grecaptcha.ready(function () {
+      grecaptcha.execute('SITE_KEY_GOES_HERE', { action: 'home' }).then(function (token) {
+          document.getElementById("game").finishedCaptcha(token);
+      });
+  });
+  }
+</script>
+<form>
+<div id='recaptcha' class="g-recaptcha"
+data-sitekey="SITE_KEY_GOES_HERE"
+data-callback="onSubmit"
+data-size="invisible"></div>
+</form>
+```
+
+After adding this embed, you must replace `SITE_KEY_GOES_HERE` with the value of your google recaptcha site key. You also must fill in your secret key in config.sample.py.
+
+For the vanilla (AS3) client, you will not be required to add this HTML embed. You only need to get a pair of recaptcha keys and fill them out in your configuration file. Dash will render the HTML templates to have your recaptcha v3 site key placed on it.
 
 ## Contributing
 
