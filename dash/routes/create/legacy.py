@@ -20,10 +20,11 @@ import bcrypt
 import string
 
 
-create = Blueprint('create', url_prefix='/create')
+legacy_create = Blueprint('legacy_create', url_prefix='/create/legacy')
+legacy_activate = Blueprint('legacy_activate', url_prefix='/activate/legacy')
 
 
-@create.post('/')
+@legacy_create.post('/')
 async def register(request):
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
@@ -36,7 +37,7 @@ async def register(request):
         return await validate_password_email(request, post_data)
 
 
-@create.get('/activate/<activation_key>')
+@legacy_activate.get('/<activation_key>')
 async def activate(_, activation_key):
     data = await ActivationKey.query.where(ActivationKey.activation_key == activation_key).gino.first()
     if data is not None:
@@ -53,7 +54,7 @@ async def validate_agreement(_, post_data):
     lang = post_data.get('lang', 'en')[0]
     if not int(agree_terms) or not int(agree_rules):
         return response.text(urlencode({
-            'error': i18n.t('create.terms', lang=lang)
+            'error': i18n.t('create.terms', locale=lang)
         }))
     return response.text(urlencode({'success': 1}))
 
@@ -65,23 +66,23 @@ async def validate_username(request, post_data):
 
     if not username:
         return response.text(urlencode({
-            'error': i18n.t('create.name_missing', lang=lang)
+            'error': i18n.t('create.name_missing', locale=lang)
         }))
     elif len(username) < 4 or len(username) > 12:
         return response.text(urlencode({
-            'error': i18n.t('create.name_short', lang=lang)
+            'error': i18n.t('create.name_short', locale=lang)
         }))
     elif len(re.sub('[^0-9]', '', username)) > 5:
         return response.text(urlencode({
-            'error': i18n.t('create.name_number', lang=lang)
+            'error': i18n.t('create.name_number', locale=lang)
         }))
     elif re.search('[a-zA-Z]', username) is None:
         return response.text(urlencode({
-            'error': i18n.t('create.name_letter', lang=lang)
+            'error': i18n.t('create.name_letter', locale=lang)
         }))
     elif not username.isalnum():
         return response.text(urlencode({
-            'error': i18n.t('create.name_not_allowed', lang=lang)
+            'error': i18n.t('create.name_not_allowed', locale=lang)
         }))
     elif not color.isdigit() or int(color) not in range(1, 16):
         return response.text(urlencode({'error': ''}))
@@ -97,11 +98,11 @@ async def validate_username(request, post_data):
 
         if username is None:
             return response.text(urlencode({
-                'error': i18n.t('create.name_taken', lang=lang)
+                'error': i18n.t('create.name_taken', locale=lang)
             }))
 
         return response.text(urlencode({
-            'error': i18n.t('create.name_suggest', suggestion=username, lang=lang)
+            'error': i18n.t('create.name_suggest', suggestion=username, locale=lang)
         }))
 
     request['session']['sid'] = secrets.token_urlsafe(16)
@@ -123,11 +124,11 @@ async def validate_password_email(request, post_data):
 
     if session_id != session['sid']:
         return response.text(urlencode({
-            'error': i18n.t('create.passwords_match', lang=lang)
+            'error': i18n.t('create.passwords_match', locale=lang)
         }))
 
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('gtoken')
+        gclient_response = post_data.get('recaptcha_response', [None])[0]
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
@@ -144,29 +145,29 @@ async def validate_password_email(request, post_data):
         return response.text(urlencode({'error': ''}))
     elif str(password) != str(password_confirm):
         return response.text(urlencode({
-            'error': i18n.t('create.passwords_match', lang=lang)
+            'error': i18n.t('create.passwords_match', locale=lang)
         }))
     elif len(password) < 4:
         return response.text(urlencode({
-            'error': i18n.t('create.password_short', lang=lang)
+            'error': i18n.t('create.password_short', locale=lang)
         }))
 
     _, email = parseaddr(email)
     domain = email.rsplit('@', 1)[-1]
     if not email or '@' not in email:
         return response.text(urlencode({
-            'error': i18n.t('create.email_invalid', lang=lang)
+            'error': i18n.t('create.email_invalid', locale=lang)
         }))
     elif app.config.EMAIL_WHITELIST and domain not in app.config.EMAIL_WHITELIST:
         return response.text(urlencode({
-            'error': i18n.t('create.email_invalid', lang=lang)
+            'error': i18n.t('create.email_invalid', locale=lang)
         }))
 
     email_count = await db.select([db.func.count(Penguin.email)]).where(
         db.func.lower(Penguin.email) == email.lower()).gino.scalar()
     if email_count >= app.config.MAX_ACCOUNT_EMAIL:
         return response.text(urlencode({
-            'error': i18n.t('create.email_invalid', lang=lang)
+            'error': i18n.t('create.email_invalid', locale=lang)
         }))
 
     password = Crypto.hash(password).upper()
@@ -192,7 +193,7 @@ async def validate_password_email(request, post_data):
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
 
-        mail_template = env.get_template('create_activate.html')
+        mail_template = env.get_template('en_legacy_activation.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
             subject=i18n.t('create.activate_mail_subject'),
