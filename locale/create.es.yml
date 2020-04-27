@@ -7,6 +7,14 @@ es:
   name_not_allowed: Ese nombre de usuario no está permitido.
   name_taken: Ese nombre de usuario ya ha sido escogido.
   name_suggest: Ese nombre de usuario ya ha sido escogido. Intenta éste %{suggestion}.
+  vanilla_name_suggest: Ese nombre de usuario ya ha sido escogido. Intenta éste
   passwords_match: Las contraseñas no coinciden.
   password_short: La contraseña es muy corta.
-  email_invalid: El correo eléctronico es incorrecto.
+  email_invalid: El correo eléctronico esta incorrecto.
+  balloon: el globo
+  cheese: el queso
+  igloo: el iglú
+  pizza: la pizza
+  popcorn: las palomitas
+  watermelon: la sandía
+  captcha_invalid: respuesta incorrecta

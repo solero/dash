@@ -7,6 +7,14 @@ en:
   name_not_allowed: That penguin name is not allowed.
   name_taken: That penguin name is already taken.
   name_suggest: That penguin name is already taken. Try %{suggestion}.
+  vanilla_name_suggest: That penguin name is already taken. Try
   passwords_match: Passwords do not match.
   password_short: Password is too short.
   email_invalid: Invalid email address.
+  balloon: balloon
+  cheese: cheese
+  igloo: igloo
+  pizza: pizza
+  popcorn: popcorn
+  watermelon: watermelon
+  captcha_invalid: Incorrect answer

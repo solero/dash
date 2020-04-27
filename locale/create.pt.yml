@@ -7,6 +7,14 @@ pt:
   name_not_allowed: Esse nome de pinguim não é permitido.
   name_taken: Esse nome de pinguim já foi escolhido.
   name_suggest: Esse nome de pinguim já foi escolhido. Tente %{suggestion}.
+  vanilla_name_suggest: Esse nome de pinguim já foi escolhido. Tente
   passwords_match: As senhas não correspondem.
   password_short: A senha é muito curta.
   email_invalid: Esse endereço de E-Mail é invalido.
+  balloon: balão
+  cheese: queijo
+  igloo: iglu
+  pizza: pizza
+  popcorn: pipoca
+  watermelon: melancia
+  captcha_invalid: Resposta incorreta

@@ -7,6 +7,14 @@ fr:
   name_not_allowed: Ce nom de pingouin n'est pas autorisé.
   name_taken: Ce nom de pingouin est pris.
   name_suggest: Ce nom de pingouin est pris. Essaye %{suggestion}.
+  vanilla_name_suggest: Ce nom de pingouin est pris. Essaye
   passwords_match: Les mots de passes ne correspondent pas.
   password_short: Le mot de passe est trop court.
   email_invalid: Adresse email invalide.
+  balloon: ballon
+  cheese: fromage
+  igloo: iglou
+  pizza: pizza
+  popcorn: popcorn
+  watermelon: pastèque
+  captcha_invalid: Réponse incorrecte
