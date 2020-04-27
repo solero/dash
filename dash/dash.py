@@ -3,7 +3,8 @@ from dash.data.penguin import db
 from dash import app, settings
 from dash.routes.avatar import avatar
 from dash.routes.autocomplete import autocomplete
-from dash.routes.create import create
+from dash.routes.create.legacy import legacy_create, legacy_activate
+from dash.routes.create.vanilla import vanilla_create, vanilla_activate
 
 import i18n
 import os
@@ -28,6 +29,9 @@ def main(args):
 
     app.blueprint(avatar)
     app.blueprint(autocomplete)
-    app.blueprint(create)
+    app.blueprint(legacy_create)
+    app.blueprint(vanilla_create)
+    app.blueprint(legacy_activate)
+    app.blueprint(vanilla_activate)
 
     app.run(host=app.config.ADDRESS, port=app.config.PORT)
