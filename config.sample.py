@@ -24,7 +24,7 @@ where your Houdini database is located.
 POSTGRES_HOST = 'localhost'
 POSTGRES_NAME = 'houdini'
 POSTGRES_USER = 'postgres'
-POSTGRES_PASSWORD = 'postgres'
+POSTGRES_PASSWORD = 'password'
 
 
 """
