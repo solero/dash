@@ -74,7 +74,7 @@ ACTIVATE_REDIRECT : str
     via email.
 """
 ACTIVATE_PLAYER = True
-ACTIVATE_LINK = 'http://secure.clubpenguin.com/create/activate/'
+ACTIVATE_LINK = 'http://secure.clubpenguin.com/penguin/activate/'
 ACTIVATE_REDIRECT = ''
 
 """
