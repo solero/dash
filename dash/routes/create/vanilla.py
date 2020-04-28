@@ -335,7 +335,7 @@ async def _validate_registration(request, post_data, lang):
             )
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        #sg.send(message)
+        sg.send(message)
         await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
 
     return response.redirect(app.config.PLAY_SUBDOMAIN)
