@@ -98,8 +98,9 @@ location /penguin/activate {
 Vanilla (AS3):
 
 # server_name play.clubpenguin.com (AS3 sub-domain)
-location /penguin/create {
-    proxy_pass http://localhost:3000/create/vanilla;
+
+location ~ ^/(.*)/penguin/create {
+    proxy_pass http://localhost:3000/create/vanilla/$1;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -109,8 +110,8 @@ location /penguin/create {
 ...
 
  # server_name play.clubpenguin.com (AS3 sub-domain)
-location /penguin/activate {
-    proxy_pass http://localhost:3000/activate/vanilla;
+location ~ ^/(.*)/penguin/activate {
+    proxy_pass http://localhost:3000/activate/vanilla/$1;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
