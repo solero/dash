@@ -77,8 +77,8 @@ ACTIVATE_REDIRECT : str
     via email.
 """
 ACTIVATE_PLAYER = True
-VANILLA_ACTIVATE_LINK = 'http://secure.clubpenguin.com/penguin/activate/'
-LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com/penguin/activate/'
+VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com/' # AS3
+LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com/' # AS2
 ACTIVATE_REDIRECT = ''
 
 """
