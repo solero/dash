@@ -99,6 +99,14 @@ Vanilla (AS3):
 
 # server_name play.clubpenguin.com (AS3 sub-domain)
 
+location /penguin/create {
+    proxy_pass http://localhost:3000/create/vanilla/en;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
 location ~ ^/(.*)/penguin/create {
     proxy_pass http://localhost:3000/create/vanilla/$1;
     proxy_redirect off;
@@ -117,6 +125,7 @@ location ~ ^/(.*)/penguin/activate {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
+
 
 CardJitsuSnow (AS3):
 
