@@ -7,8 +7,12 @@ from sanic.log import logger
 
 import io
 import asyncio
+import urllib
+import os
 
-
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]
+urllib.request.install_opener(opener)
 avatar = Blueprint('avatar', url_prefix='/avatar')
 
 
@@ -36,6 +40,11 @@ def build_avatar(clothing, size):
     avatar_image = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     for item in filter(None, clothing):
         try:
+            if not os.path.isdir(f"./items/{size}"):
+                os.makedirs(f"./items/{size}")
+            if not os.path.isfile(f"./items/{size}/{item}.png"): # temporary solution until wand mounts the avatar folder into dash
+                urllib.request.urlretrieve(f"https://icer.ink/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{item}.png", f"./items/{size}/{item}.png")
+            
             item_image = Image.open(f'./items/{size}/{item}.png', 'r')
             avatar_image.paste(item_image, (0, 0), item_image)
         except FileNotFoundError as e:
