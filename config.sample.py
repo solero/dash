@@ -77,8 +77,8 @@ ACTIVATE_REDIRECT : str
     via email.
 """
 ACTIVATE_PLAYER = True
-VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com/' # AS3
-LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com/' # AS2
+VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com' # AS3
+LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com' # AS2
 ACTIVATE_REDIRECT = ''
 
 """
@@ -106,7 +106,7 @@ MAX_ACCOUNT_EMAIL : int
 SITE_NAME = 'Houdini'
 FROM_EMAIL = 'noreply@houdi.ni'
 SENDGRID_API_KEY = ''
-EMAIL_WHITELIST = ['gmail.com', 'hotmail.com']
+EMAIL_WHITELIST = ['gmail.com', 'hotmail.com', 'icloud.com']
 MAX_ACCOUNT_EMAIL = 5
 
 """
