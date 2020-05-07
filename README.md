@@ -136,7 +136,7 @@ location /social/autocomplete/v2/search/suggestions {
 # card jitsu snow
 
 # server_name play.clubpenguin.com
-location ~ ^/(.*)/web-service/snfgenerator/session$ {
+location ^/(.*)/web-service/snfgenerator/session$ {
     proxy_pass http://localhost:3000/session;
     proxy_redirect off;
     proxy_set_header Host $host;
