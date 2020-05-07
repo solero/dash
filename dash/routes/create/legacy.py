@@ -80,7 +80,7 @@ async def validate_username(request, post_data):
         return response.text(urlencode({
             'error': i18n.t('create.name_letter', locale=lang)
         }))
-    elif not username.isalnum():
+    elif not all(letter.isalnum() or letter.isspace() for letter in username):
         return response.text(urlencode({
             'error': i18n.t('create.name_not_allowed', locale=lang)
         }))

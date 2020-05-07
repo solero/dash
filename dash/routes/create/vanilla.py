@@ -389,7 +389,7 @@ async def _validate_username(request, post_data, lang):
             }
         )
 
-    elif not username.isalnum():
+    elif not all(letter.isalnum() or letter.isspace() for letter in username):
         request['session']['errors']['name'] = True
         return response.json(
             [
