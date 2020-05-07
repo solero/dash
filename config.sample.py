@@ -106,7 +106,7 @@ MAX_ACCOUNT_EMAIL : int
 SITE_NAME = 'Houdini'
 FROM_EMAIL = 'noreply@houdi.ni'
 SENDGRID_API_KEY = ''
-EMAIL_WHITELIST = ['gmail.com', 'hotmail.com', 'icloud.com']
+EMAIL_WHITELIST = ['gmail.com', 'hotmail.com', 'icloud.com', 'yahoo.com', 'aol.com']
 MAX_ACCOUNT_EMAIL = 5
 
 """
