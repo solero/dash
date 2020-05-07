@@ -1,6 +1,14 @@
 FROM python:3-alpine
 
-RUN apk add openssl build-base openssl-dev libffi-dev jpeg-dev zlib-dev redis postgresql-client
+RUN apk add \
+    openssl \
+    build-base \
+    openssl-dev \
+    libffi-dev \
+    jpeg-dev \
+    zlib-dev \
+    redis \
+    postgresql-client
 
 WORKDIR /usr/src/dash
 
@@ -12,6 +20,4 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
-CMD ["sh", "-c", "python ./bootstrap.py"]
+ENTRYPOINT [ "python", "./bootstrap.py" ]
