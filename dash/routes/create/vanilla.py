@@ -291,7 +291,7 @@ async def _validate_registration(request, post_data, lang):
     if app.config.USERNAME_FORCE_CASE:
         username = username.title()
 
-    penguin = await Penguin.create(username=username.lower(), nickname=username, password=password, email=email,
+    penguin = await Penguin.create(username=username, nickname=username, password=password, email=email,
                                    color=int(color),
                                    approval_en=app.config.APPROVE_USERNAME,
                                    approval_pt=app.config.APPROVE_USERNAME,
