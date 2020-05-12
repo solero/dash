@@ -101,14 +101,13 @@ location ~ ^/(.*)/penguin/create {
 ...
 
  # server_name play.clubpenguin.com (AS3 sub-domain)
-location ~ ^/(.*)/penguin/activate {
-    proxy_pass http://localhost:3000/activate/vanilla/$1;
+location ~ ^/(.*)/penguin/activate/(.*) {
+    proxy_pass http://localhost:3000/activate/vanilla/$1/$2;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
-
 ...
 
 # server_name play.clubpenguin.com
