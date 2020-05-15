@@ -15,11 +15,21 @@ opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9
 urllib.request.install_opener(opener)
 avatar = Blueprint('avatar', url_prefix='/avatar')
 
+valid_sizes = [
+    60,
+    88,
+    95,
+    120,
+    300,
+    600
+]
 
 @avatar.get('/<penguin_id:int>')
 async def get_avatar(request, penguin_id: int):
     background = request.raw_args.get('photo', 'true')
     size = request.raw_args.get('size', 120)
+    if size not in valid_sizes:
+        return response.json({"message": 'Invalid size'}, status=400)
 
     clothing = await Penguin.select(
         'photo', 'flag', 'color', 'head', 'face', 'body',  'neck', 'hand', 'feet'
@@ -32,7 +42,10 @@ async def get_avatar(request, penguin_id: int):
         clothing.pop(0)
 
     loop = asyncio.get_event_loop()
-    image = await loop.run_in_executor(None, build_avatar, clothing, int(size))
+    try:
+        image = await loop.run_in_executor(None, build_avatar, clothing, int(size))
+    except:
+        return response.json({"message": "Something has gone wrong."}, status=500)
     return response.raw(image, headers={'Content-type': 'image/png'})
 
 
