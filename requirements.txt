@@ -1,6 +1,6 @@
 fast-autocomplete
 aiohttp
-sanic
+sanic == 19.12.2
 sanic_session
 sendgrid
 bcrypt
