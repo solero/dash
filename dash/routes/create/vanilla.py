@@ -307,7 +307,7 @@ async def _validate_registration(request, post_data, lang):
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
         if lang == 'es':
-            mail_template = env.get_template('emails/activation/vanilla/en.html')
+            mail_template = env.get_template('emails/activation/vanilla/es.html')
         elif lang == 'pt':
             mail_template = env.get_template('emails/activation/vanilla/pt.html')
         elif lang == 'fr':
