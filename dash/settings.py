@@ -14,19 +14,18 @@ USERNAME_FORCE_CASE = True
 APPROVE_NICKNAME = False
 
 ACTIVATE_PLAYER = True
-ACTIVATE_LINK = 'http://secure.clubpenguin.com/create/activate/'
 ACTIVATE_REDIRECT = ''
 
 SITE_NAME = 'Houdini'
 FROM_EMAIL = 'noreply@houdi.ni'
 SENDGRID_API_KEY = ''
 EMAIL_WHITELIST = []
-
 MAX_ACCOUNT_EMAIL = 5
 
 STATIC_KEY = 'houdini'
 
-PLAY_SUBDOMAIN = 'http://play.clubpenguin.com'
+LEGACY_PLAY_LINK = 'http://old.localhost'
+VANILLA_PLAY_LINK = 'http://play.localhost'
 
 CJS_HOST = "localhost"
 CJS_PORT = 7002
