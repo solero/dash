@@ -5,6 +5,7 @@ from dash.routes.avatar import avatar
 from dash.routes.autocomplete import autocomplete
 from dash.routes.create.legacy import legacy_create, legacy_activate
 from dash.routes.create.vanilla import vanilla_create, vanilla_activate
+from dash.routes.password import password
 from dash.routes.snow.session import session
 from dash.routes.snow.swrequest import swrequest
 
@@ -37,5 +38,6 @@ def main(args):
     app.blueprint(vanilla_activate)
     app.blueprint(session)
     app.blueprint(swrequest)
+    app.blueprint(password)
 
     app.run(host=app.config.ADDRESS, port=app.config.PORT)
