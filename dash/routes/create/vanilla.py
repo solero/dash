@@ -316,12 +316,12 @@ async def _validate_registration(request, post_data, lang):
             mail_template = env.get_template('emails/activation/vanilla/en.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
-            subject=i18n.t('create.activate_mail_subject', locale=lang),
+            subject=i18n.t('activate.mail_subject', locale=lang),
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
                 activation_code=activation_key,
                 play_subdomain=app.config.PLAY_SUBDOMAIN,
-                activate_link=f'{app.config.VANILLA_ACTIVATE_LINK}/{lang}/penguin/activate'
+                activate_link=f'{app.config.VANILLA_PLAY_LINK}/{lang}/penguin/activate'
             )
         )
         #sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)

@@ -124,11 +124,14 @@ STATIC_KEY = 'houdini'
 Sub-domains
 ------------
 
-PLAY_SUBDOMAIN : str
-    Play page sub-domain used to load static content for the AS3 registration page.
-"""
-PLAY_SUBDOMAIN = 'http://play.clubpenguin.com'
+LEGACY_PLAY_LINK : str
+    Play page sub-domain used to handle links for the AS2 registration page.
 
+VANILLA_PLAY_LINK : str
+    Play page sub-domain used to handle links & load content for the AS3 registration page.
+"""
+LEGACY_PLAY_LINK = 'http://old.clubpenguin.com' # AS2
+VANILLA_PLAY_LINK = 'http://play.clubpenguin.com' # AS3
 
 # For more configuration settings see
 # https://sanic.readthedocs.io/en/latest/sanic/config.html#builtin-configuration-values
