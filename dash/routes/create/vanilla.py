@@ -84,7 +84,7 @@ async def create_page(request, lang):
     if lang == 'fr':
         register_template = env.get_template('create/fr.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             anon_token=request['session']['anon_token'],
             captcha_1=base64_captchas[0],
             captcha_2=base64_captchas[1],
@@ -96,7 +96,7 @@ async def create_page(request, lang):
     elif lang == 'es':
         register_template = env.get_template('create/es.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             anon_token=request['session']['anon_token'],
             captcha_1=base64_captchas[0],
             captcha_2=base64_captchas[1],
@@ -108,7 +108,7 @@ async def create_page(request, lang):
     elif lang == 'pt':
         register_template = env.get_template('create/pt.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             anon_token=request['session']['anon_token'],
             captcha_1=base64_captchas[0],
             captcha_2=base64_captchas[1],
@@ -120,7 +120,7 @@ async def create_page(request, lang):
     else:
         register_template = env.get_template('create/en.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             anon_token=request['session']['anon_token'],
             captcha_1=base64_captchas[0],
             captcha_2=base64_captchas[1],
@@ -171,28 +171,28 @@ async def activate_page(request, lang):
     if lang == 'fr':
         register_template = env.get_template('activate/fr.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
     elif lang == 'es':
         register_template = env.get_template('activate/es.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
     elif lang == 'pt':
         register_template = env.get_template('pt_vanilla_activation.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
     else:
         register_template = env.get_template('activate/en.html')
         page = register_template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
@@ -320,7 +320,7 @@ async def _validate_registration(request, post_data, lang):
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
                 activation_code=activation_key,
-                play_subdomain=app.config.PLAY_SUBDOMAIN,
+                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
                 activate_link=f'{app.config.VANILLA_PLAY_LINK}/{lang}/penguin/activate'
             )
         )
@@ -328,7 +328,7 @@ async def _validate_registration(request, post_data, lang):
         #sg.send(message)
         await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
 
-    return response.redirect(app.config.PLAY_SUBDOMAIN)
+    return response.redirect(app.config.VANILLA_PLAY_LINK)
 
 
 async def _validate_username(request, post_data, lang):
