@@ -42,7 +42,10 @@ async def get_avatar(request, penguin_id: int):
         clothing.pop(0)
 
     loop = asyncio.get_event_loop()
-    image = await loop.run_in_executor(None, build_avatar, clothing, int(size))
+    try:
+        image = await loop.run_in_executor(None, build_avatar, clothing, int(size))
+    except Exception as e:
+        return response.json({"message": str(e)}, status=500)
     return response.raw(image, headers={'Content-type': 'image/png'})
 
 
