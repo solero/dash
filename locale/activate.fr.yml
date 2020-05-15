@@ -1,0 +1,5 @@
+fr:
+  mail_subject: Activez votre compte.
+  username_404: Nom d'utilisateur introuvable.
+  activation_key_404: Clé d'activation introuvable.
+  error: Une erreur s'est produite, veuillez réessayer.

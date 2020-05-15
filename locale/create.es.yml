@@ -11,7 +11,6 @@ es:
   passwords_match: Las contraseñas no coinciden.
   password_short: La contraseña es muy corta.
   email_invalid: El correo eléctronico esta incorrecto.
-  activate_mail_subject: Activa tu cuenta
   balloon: el globo
   cheese: el queso
   igloo: el iglú

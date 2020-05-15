@@ -1,0 +1,5 @@
+es:
+  mail_subject: Activa tu cuenta.
+  username_404: Usuario no encontrado.
+  activation_key_404: Clave de activación no encontrada.
+  error: Ha ocurrido un error. Por favor intente de nuevo.
