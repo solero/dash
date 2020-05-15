@@ -39,9 +39,9 @@ all_captchas = [
 async def activate(request, lang, code):
     activation_data = await ActivationKey.query.where(ActivationKey.activation_key == code).gino.first()
     if not code:
-        return response.json({'message': 'An error occured, please try again.'}, status=404)
+        return response.json({'message': i18n.t('activate.error', locale=lang)}, status=404)
     elif not activation_data:
-        return response.json({'message': 'Activation key not found.'}, status=404)
+        return response.json({'message': i18n.t('activate.activation_key_404', locale=lang)}, status=404)
     else:
         await Penguin.update.values(active=True) \
         .where(Penguin.id == activation_data.penguin_id).gino.status()
@@ -223,11 +223,11 @@ async def activate_page(request, lang):
                     }))
     # TODO: Better responses for these?
     if not username or not activation_code:
-        return response.json({'message': 'An error occured, please try again.'}, status=404)
+        return response.json({'message': i18n.t('activate.error', locale=lang)}, status=404)
     elif not activation_data:
-        return response.json({'message': 'Activation key not found.'}, status=404)
+        return response.json({'message': i18n.t('activate.activation_key_404', locale=lang)}, status=404)
     elif not user_data:
-        return response.json({'message': 'Username not found.'}, status=404)
+        return response.json({'message': i18n.t('activate.username_404', locale=lang)}, status=404)
     else:
         await Penguin.update.values(active=True).where(
             Penguin.id == activation_data.penguin_id
