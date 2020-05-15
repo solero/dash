@@ -108,11 +108,11 @@ async def password_reset(request, lang):
                 
                 _edit_title(
                     '#forgotpassword h2',
-                    i18n.t(f'password.password_title', locale=lang),
+                    i18n.t('password.password_title', locale=lang),
                 ),
                 _edit_prompt(
                     '#penguin-forgot-password-form span',
-                    i18n.t(f'password.password_prompt', locale=lang),
+                    i18n.t('password.password_prompt', locale=lang),
                 ) 
             ],
             headers={
