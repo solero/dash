@@ -20,6 +20,8 @@ avatar = Blueprint('avatar', url_prefix='/avatar')
 async def get_avatar(request, penguin_id: int):
     background = request.raw_args.get('photo', 'true')
     size = request.raw_args.get('size', 120)
+    if int(size) > 600:
+        size = '600'
 
     clothing = await Penguin.select(
         'photo', 'flag', 'color', 'head', 'face', 'body',  'neck', 'hand', 'feet'
