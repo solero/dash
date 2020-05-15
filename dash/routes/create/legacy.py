@@ -193,7 +193,7 @@ async def validate_password_email(request, post_data):
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
 
-        mail_template = env.get_template('en_legacy_activation.html')
+        mail_template = env.get_template('emails/activation/legacy/en.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
             subject=i18n.t('create.activate_mail_subject', locale=lang),

@@ -82,7 +82,7 @@ async def create_page(request, lang):
         base64_captchas.append(captcha_base64.decode('utf-8'))
 
     if lang == 'fr':
-        register_template = env.get_template('fr_register.html')
+        register_template = env.get_template('create/fr.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             anon_token=request['session']['anon_token'],
@@ -94,7 +94,7 @@ async def create_page(request, lang):
         )
         return response.html(page)
     elif lang == 'es':
-        register_template = env.get_template('es_register.html')
+        register_template = env.get_template('create/es.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             anon_token=request['session']['anon_token'],
@@ -106,7 +106,7 @@ async def create_page(request, lang):
         )
         return response.html(page)
     elif lang == 'pt':
-        register_template = env.get_template('pt_register.html')
+        register_template = env.get_template('create/pt.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             anon_token=request['session']['anon_token'],
@@ -118,7 +118,7 @@ async def create_page(request, lang):
         )
         return response.html(page)
     else:
-        register_template = env.get_template('en_register.html')
+        register_template = env.get_template('create/en.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             anon_token=request['session']['anon_token'],
@@ -169,14 +169,14 @@ async def register(request, lang):
 @vanilla_activate.get('/<lang>')
 async def activate_page(request, lang):
     if lang == 'fr':
-        register_template = env.get_template('fr_vanilla_activation.html')
+        register_template = env.get_template('activate/fr.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
     elif lang == 'es':
-        register_template = env.get_template('es_vanilla_activation.html')
+        register_template = env.get_template('activate/es.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             site_key=app.config.GSITE_KEY
@@ -190,7 +190,7 @@ async def activate_page(request, lang):
         )
         return response.html(page)
     else:
-        register_template = env.get_template('en_vanilla_activation.html')
+        register_template = env.get_template('activate/en.html')
         page = register_template.render(
             play_subdomain=app.config.PLAY_SUBDOMAIN,
             site_key=app.config.GSITE_KEY
@@ -307,13 +307,13 @@ async def _validate_registration(request, post_data, lang):
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
         if lang == 'es':
-            mail_template = env.get_template('es_vanilla_email.html')
+            mail_template = env.get_template('emails/activation/vanilla/en.html')
         elif lang == 'pt':
-            mail_template = env.get_template('pt_vanilla_email.html')
+            mail_template = env.get_template('emails/activation/vanilla/pt.html')
         elif lang == 'fr':
-            mail_template = env.get_template('fr_vanilla_email.html')
+            mail_template = env.get_template('emails/activation/vanilla/fr.html')
         else:
-            mail_template = env.get_template('en_vanilla_email.html')
+            mail_template = env.get_template('emails/activation/vanilla/en.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
             subject=i18n.t('create.activate_mail_subject', locale=lang),
@@ -324,8 +324,8 @@ async def _validate_registration(request, post_data, lang):
                 activate_link=f'{app.config.VANILLA_ACTIVATE_LINK}/{lang}/penguin/activate'
             )
         )
-        sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        sg.send(message)
+        #sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
+        #sg.send(message)
         await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
 
     return response.redirect(app.config.PLAY_SUBDOMAIN)
@@ -652,7 +652,7 @@ def _update_captcha(new_setting):
 
 
 def _make_name_suggestion(names, message):
-    name_suggestion_template = env.get_template('name_suggestion.html')
+    name_suggestion_template = env.get_template('html/name_suggestion.html')
     return (
         {
             'command': 'insert',
@@ -667,7 +667,7 @@ def _make_name_suggestion(names, message):
 
 
 def _make_error_message(name, message):
-    error_template = env.get_template('error.html')
+    error_template = env.get_template('html/error.html')
     return (
         {
             'command': 'insert',
