@@ -143,5 +143,21 @@ VANILLA_PLAY_LINK : str
 LEGACY_PLAY_LINK = 'http://old.clubpenguin.com' # AS2
 VANILLA_PLAY_LINK = 'http://play.clubpenguin.com' # AS3
 
+
+"""
+Password reset
+-----------------
+
+AUTH_TTL : int
+    Time in seconds till a players password reset token expires.
+PASSWORD_REDIRECT : str
+    URL to redirect to when player has reset their password.
+"""
+AUTH_TTL = 3600
+PASSWORD_REDIRECT = ''
+
+
+
+
 # For more configuration settings see
 # https://sanic.readthedocs.io/en/latest/sanic/config.html#builtin-configuration-values
