@@ -78,18 +78,17 @@ Player activation
 ACTIVATE_PLAYER : bool
     Activate player automatically so no email needs to be sent.
     Enabling this option requires a SendGrid API key.
-LEGACY_ACTIVATE_LINK : str
-    URL player is taken to for activation.
-VANILLA_ACTIVATE_LINK : str
-    URL player is taken to for activation.
-ACTIVATE_REDIRECT : str
+VANILLA_ACTIVATE_REDIRECT : str
     URL to redirect to when player has activated their account
-    via email.
+    via email through the legacy domain.
+LEGACY_ACTIVATE_REDIRECT : str
+    URL to redirect to when player has activated their account
+    via email through the vanilla domain.
 """
 ACTIVATE_PLAYER = True
-VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com' # AS3
-LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com' # AS2
-ACTIVATE_REDIRECT = ''
+VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com' 
+LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com' 
+
 
 """
 Email
