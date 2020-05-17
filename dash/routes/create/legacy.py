@@ -21,7 +21,6 @@ import string
 
 
 legacy_create = Blueprint('legacy_create', url_prefix='/create/legacy')
-legacy_activate = Blueprint('legacy_activate', url_prefix='/activate/legacy')
 
 
 @legacy_create.post('/')
@@ -35,18 +34,7 @@ async def register(request):
         return await validate_username(request, post_data)
     elif action == 'validate_password_email':
         return await validate_password_email(request, post_data)
-
-
-@legacy_activate.get('/<activation_key>')
-async def activate(_, activation_key):
-    data = await ActivationKey.query.where(ActivationKey.activation_key == activation_key).gino.first()
-    if data is not None:
-        await Penguin.update.values(active=True) \
-            .where(Penguin.id == data.penguin_id).gino.status()
-        await ActivationKey.delete.where((ActivationKey.penguin_id == data.penguin_id)).gino.status()
-        return response.redirect(app.config.ACTIVATE_REDIRECT)
-    return response.json({'message': 'Not found'}, status=404)
-
+        
 
 async def validate_agreement(_, post_data):
     agree_terms = post_data.get('agree_to_terms')[0]
