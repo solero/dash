@@ -120,6 +120,7 @@
   <label for="edit-email">Enter Parent Email Address </label>
  <input type="text" id="edit-email" name="email" value="" size="45" maxlength="128" class="form-text" />
 </div>
+<input type="hidden" name="recaptcha_response" id="recaptchaResponse">
 <input type="submit" id="edit-submit" name="op" value="Submit" class="form-submit" /><input type="hidden" name="form_build_id" value="form-lN-7tMI0A8iRkgWJU4ctiB9IAR_37QR-6uI-EefTSVQ" />
 <input type="hidden" name="form_id" value="penguin_forgot_password_form" />
 </div></form></div>  </div>
@@ -195,6 +196,15 @@
 <!--//--><![CDATA[//><!--
 window.CKEDITOR_BASEPATH = '/sites/all/libraries/ckeditor/'
 //--><!]]>
+</script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+<script>
+  grecaptcha.ready(function () {
+      grecaptcha.execute('{{ site_key }}', { action: 'home' }).then(function (token) {
+          var recaptchaResponse = document.getElementById('recaptchaResponse');
+          recaptchaResponse.value = token;
+      });
+  });
 </script>
 <script type="text/javascript" src="{{ play_subdomain }}/sites/default/files/js/js_Z2Wmgi-SDF5TO94McjN_LN6dFSN9RYXommblEiu4JsA.js"></script>
 <script type="text/javascript" src="{{ play_subdomain }}/sites/default/files/js/js_YoJM6suksyO9VPvFz3ih8g-EVtXgIomijLvHL7f3_70.js"></script>
