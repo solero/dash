@@ -1,10 +1,12 @@
 from urllib.parse import parse_qs
 from sanic import response
 from sanic import Blueprint
+from sendgrid import SendGridAPIClient, Mail
 from dash import env, app
 from dash.data.penguin import Penguin
 
 import i18n
+import secrets
 
 password = Blueprint('password', url_prefix='/password')
 
@@ -90,6 +92,7 @@ async def password_reset(request, lang):
             )
             sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
             sg.send(message)
+            await app.redis.setex(f'{player_data.id}.reset_key', app.config.AUTH_TTL, reset_key)
         return response.json(
             [
                 _remove_selector('#edit-name'),
