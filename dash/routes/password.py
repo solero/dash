@@ -14,28 +14,28 @@ async def password_reset_page(request, lang):
     if lang == 'fr':
         template = env.get_template('password/fr.html')
         page = template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         )
         return response.html(page)
     
     elif lang == 'es':
         template = env.get_template('password/es.html')
         page = template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         )
         return response.html(page)
     
     elif lang == 'pt':
         template = env.get_template('password/pt.html')
         page = template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         )
         return response.html(page)
     
     else:
         template = env.get_template('password/en.html')
         page = template.render(
-            play_subdomain=app.config.PLAY_SUBDOMAIN,
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         )
         return response.html(page)
 
