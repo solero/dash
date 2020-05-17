@@ -46,35 +46,25 @@ async def password_reset(request, lang):
     post_data = parse_qs(query_string)
     username = post_data.get('name', [None])[0]
     email = post_data.get('email', [None])[0]
-    if not username or not email or '@' not in email:
-        if not username:
+    if not username:
             return response.json(
-                _add_class('name', 'error'),
+                [
+                    _add_class('name', 'error')
+                ],
                 headers={
                     'X-Drupal-Ajax-Token': 1
                 }
             )
-        else:
-            return response.json(
-                _remove_class('name', 'error'),
-                headers={
-                    'X-Drupal-Ajax-Token': 1
-                }
-            )
-        if not email or '@' not in email:
-            return response.json(
-                _add_class('email', 'error'),
-                headers={
-                    'X-Drupal-Ajax-Token': 1
-                }
-            )
-        else:
-            return response.json(
-                _remove_class('email', 'error'),
-                headers={
-                    'X-Drupal-Ajax-Token': 1
-                }
-            )
+    elif not email or '@' not in email:
+        return response.json(
+            [
+                _add_class('email', 'error')
+            ],
+            headers={
+                'X-Drupal-Ajax-Token': 1
+            }
+        )
+
     else:
         player_data = await Penguin.query.where(
             Penguin.email == email
