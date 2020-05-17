@@ -188,7 +188,7 @@ location /api/v0.2/xxx/game/get/world-name-service/start_world_request {
 
 ...
 
-# server_name media.clubpenguin.com
+# server_name play.clubpenguin.com
 location ~ ^/avatar/(.*)/cp$ {
     proxy_pass http://localhost:3000/avatar/$1$is_args$args;
     proxy_redirect off;
