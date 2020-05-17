@@ -52,9 +52,9 @@ required by the Club Penguin client.
 Sample for nginx config:
 
 ```conf
-# legacy
+# legacy (AS2)
 
-# server_name play.clubpenguin.com (AS2 sub-domain)
+# server_name play.clubpenguin.com 
 location /create_account/create_account.php {
     proxy_pass http://localhost:3000/create/legacy;
     proxy_redirect off;
@@ -65,7 +65,7 @@ location /create_account/create_account.php {
 
 ...
 
-# server_name play.clubpenguin.com (AS2 sub-domain)
+# server_name play.clubpenguin.com 
 location /penguin/activate {
     proxy_pass http://localhost:3000/activate/legacy;
     proxy_redirect off;
@@ -76,20 +76,9 @@ location /penguin/activate {
 
 ...
 
-# vanilla
+# vanilla (AS3)
 
-# server_name play.clubpenguin.com (AS3 sub-domain)
-
-location /penguin/create {
-    proxy_pass http://localhost:3000/create/vanilla/en;
-    proxy_redirect off;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-}
-
-...
-
+# server_name play.clubpenguin.com
 location ~ ^/(.*)/penguin/create {
     proxy_pass http://localhost:3000/create/vanilla/$1;
     proxy_redirect off;
@@ -100,7 +89,18 @@ location ~ ^/(.*)/penguin/create {
 
 ...
 
- # server_name play.clubpenguin.com (AS3 sub-domain)
+# server_name play.clubpenguin.com
+location /penguin/create {
+    proxy_pass http://localhost:3000/create/vanilla/en;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name play.clubpenguin.com 
 location ~ ^/(.*)/penguin/activate/(.*) {
     proxy_pass http://localhost:3000/activate/vanilla/$1/$2;
     proxy_redirect off;
@@ -108,11 +108,12 @@ location ~ ^/(.*)/penguin/activate/(.*) {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 }
+
 ...
 
 # server_name play.clubpenguin.com
-location ~ ^/avatar/(.*)/cp$ {
-    proxy_pass http://localhost:3000/avatar/$1$is_args$args;
+location ~ ^/(.*)/penguin/activate {
+    proxy_pass http://localhost:3000/activate/vanilla/$1;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -121,9 +122,9 @@ location ~ ^/avatar/(.*)/cp$ {
 
 ...
 
-# server_name media.clubpenguin.com
-location /social/autocomplete/v2/search/suggestions {
-    proxy_pass http://localhost:3000/autocomplete;
+# server_name play.clubpenguin.com
+location /penguin/activate {
+    proxy_pass http://localhost:3000/activate/vanilla/en;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -132,7 +133,38 @@ location /social/autocomplete/v2/search/suggestions {
 
 ...
 
-# card jitsu snow
+# server_name play.clubpenguin.com
+location ~ ^/(.*)/penguin/forgot-password/(.*) {
+    proxy_pass http://localhost:3000/password/$1/$2;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name play.clubpenguin.com
+location ~ ^/(.*)/penguin/forgot-password {
+    proxy_pass http://localhost:3000/password/$1;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name play.clubpenguin.com
+location /penguin/forgot-password {
+    proxy_pass http://localhost:3000/password/en;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
 
 # server_name play.clubpenguin.com
 location ^/(.*)/web-service/snfgenerator/session$ {
@@ -148,6 +180,28 @@ location ^/(.*)/web-service/snfgenerator/session$ {
 # server_name play.clubpenguin.com
 location /api/v0.2/xxx/game/get/world-name-service/start_world_request {
     proxy_pass http://localhost:3000/swrequest;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name media.clubpenguin.com
+location ~ ^/avatar/(.*)/cp$ {
+    proxy_pass http://localhost:3000/avatar/$1$is_args$args;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
+
+...
+
+# server_name media.clubpenguin.com
+location /social/autocomplete/v2/search/suggestions {
+    proxy_pass http://localhost:3000/autocomplete;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
