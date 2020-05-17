@@ -1,5 +1,6 @@
 en:
   mail_subject: Activate your account.
   username_404: Username not found.
+  incorrect_username: This username does not match the activation key.
   activation_key_404: Activation key not found.
   error: An error occured, please try again.

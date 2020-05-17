@@ -1,5 +1,6 @@
 pt:
   mail_subject: Ative sua conta.
   username_404: Nome de usuário não encontrado.
+  incorrect_username: Este nome de usuário não corresponde à chave de ativação.
   activation_key_404: Chave de ativação não encontrada.
   error: Ocorreu um erro. Por favor, tente novamente.
