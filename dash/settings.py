@@ -6,6 +6,9 @@ POSTGRES_NAME = 'houdini'
 POSTGRES_USER = 'postgres'
 POSTGRES_PASSWORD = 'postgres'
 
+REDIS_ADDRESS = 'localhost'
+REDIS_PORT = 6379
+
 GCAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
 GSITE_KEY = ''
 GSECRET_KEY = ''
@@ -26,6 +29,8 @@ STATIC_KEY = 'houdini'
 
 LEGACY_PLAY_LINK = 'http://old.localhost'
 VANILLA_PLAY_LINK = 'http://play.localhost'
+
+AUTH_TTL = 3600
 
 CJS_HOST = "localhost"
 CJS_PORT = 7002
