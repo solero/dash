@@ -1,5 +1,6 @@
 fast-autocomplete
 aiohttp
+aioredis
 sanic == 19.12.2
 sanic_session
 sendgrid
