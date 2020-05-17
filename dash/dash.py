@@ -3,8 +3,10 @@ from dash.data.penguin import db
 from dash import app, settings
 from dash.routes.avatar import avatar
 from dash.routes.autocomplete import autocomplete
-from dash.routes.create.legacy import legacy_create, legacy_activate
-from dash.routes.create.vanilla import vanilla_create, vanilla_activate
+from dash.routes.create.legacy import legacy_create
+from dash.routes.create.vanilla import vanilla_create
+from dash.routes.activate.legacy import legacy_activate
+from dash.routes.activate.vanilla import vanilla_activate
 from dash.routes.password import password
 from dash.routes.snow.session import session
 from dash.routes.snow.swrequest import swrequest
