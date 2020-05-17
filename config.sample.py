@@ -28,6 +28,16 @@ POSTGRES_PASSWORD = 'password'
 
 
 """
+Redis configuration
+----------------------
+
+Here place the Redis configuration.
+"""
+
+REDIS_ADDRESS = 'localhost'
+REDIS_PORT = 6379
+
+"""
 Google reCAPTCHA
 ----------------
 
