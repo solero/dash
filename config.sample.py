@@ -51,8 +51,8 @@ GSECRET_KEY : str
     https://www.google.com/recaptcha/admin/create
 """
 GCAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
-GSECRET_KEY = ''
 GSITE_KEY = ''
+GSECRET_KEY = ''
 
 """
 Player usernames
@@ -77,7 +77,7 @@ Player activation
 
 ACTIVATE_PLAYER : bool
     Activate player automatically so no email needs to be sent.
-    Enabling this option requires a SendGrid API key.
+    Disabling this option requires a SendGrid API key.
 VANILLA_ACTIVATE_REDIRECT : str
     URL to redirect to when player has activated their account
     via email through the legacy domain.
