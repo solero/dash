@@ -56,7 +56,7 @@ def build_avatar(clothing, size):
             if not os.path.isdir(f"./items/{size}"):
                 os.makedirs(f"./items/{size}")
             if not os.path.isfile(f"./items/{size}/{item}.png"): # temporary solution until wand mounts the avatar folder into dash
-                urllib.request.urlretrieve(f"https://icer.ink/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{item}.png", f"./items/{size}/{item}.png")
+                urllib.request.urlretrieve(f"https://skihill.net/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{item}.png", f"./items/{size}/{item}.png")
             
             item_image = Image.open(f'./items/{size}/{item}.png', 'r')
             avatar_image.paste(item_image, (0, 0), item_image)
