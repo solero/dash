@@ -1,8 +1,8 @@
 fast-autocomplete
 aiohttp
 aioredis
-sanic
-sanic_session
+sanic == 19.12.2
+sanic_session == 0.6.0
 sendgrid
 bcrypt
 gino
