@@ -86,8 +86,8 @@ LEGACY_ACTIVATE_REDIRECT : str
     via email through the vanilla domain.
 """
 ACTIVATE_PLAYER = True
-VANILLA_ACTIVATE_LINK = 'http://play.clubpenguin.com' 
-LEGACY_ACTIVATE_LINK = 'http://play.clubpenguin.com' 
+LEGACY_ACTIVATE_REDIRECT = 'http://old.clubpenguin.com' 
+VANILLA_ACTIVATE_REDIRECT = 'http://play.clubpenguin.com' 
 
 
 """
