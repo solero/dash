@@ -49,6 +49,46 @@ async def password_reset_page(_, lang):
         return response.html(page)
 
 
+@password.get('/<lang>/<reset_token>')
+async def choose_password_page(_, lang, reset_token):
+    reset_key = await app.redis.get(f'{reset_token}.reset_key')
+    if reset_key:
+        if lang == 'fr':
+            template = env.get_template('password/choose/fr.html')
+            page = template.render(
+                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+                token=reset_token,
+                site_key=app.config.GSITE_KEY
+            )
+            return response.html(page)
+        elif lang == 'es':
+            template = env.get_template('password/choose/es.html')
+            page = template.render(
+                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+                token=reset_token,
+                site_key=app.config.GSITE_KEY
+            )
+            return response.html(page)
+        elif lang == 'pt':
+            template = env.get_template('password/choose/pt.html')
+            page = template.render(
+                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+                token=reset_token,
+                site_key=app.config.GSITE_KEY
+            )
+            return response.html(page)
+        
+        else:
+            template = env.get_template('password/choose/en.html')
+            page = template.render(
+                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+                token=reset_token,
+                site_key=app.config.GSITE_KEY
+            )
+            return response.html(page)
+    return response.json({'message': 'Reset key not found'}, status=404)
+
+
 @password.post('/<lang>')
 async def request_password_reset(request, lang):
     query_string = request.body.decode('UTF-8')
@@ -67,7 +107,7 @@ async def request_password_reset(request, lang):
                 if not gresult['success']:
                     return response.text('Your captcha score was low, please try again.')
 
-    elif not username:
+    if not username:
         return response.json(
             [
                 _add_class('name', 'error')
@@ -157,7 +197,7 @@ async def choose_password(request, lang, reset_token):
                 gresult = await resp.json()
                 if not gresult['success']:
                     return response.text('Your captcha score was low, please try again.')
-    elif not password:
+    if not password:
         return response.json(
             [
                 _add_class('password', 'error')
@@ -218,46 +258,6 @@ async def choose_password(request, lang, reset_token):
             'X-Drupal-Ajax-Token': 1
         }
     )
-
-
-@password.get('/<lang>/<reset_token>')
-async def choose_password_page(_, lang, reset_token):
-    reset_key = await app.redis.get(f'{reset_token}.reset_key')
-    if reset_key:
-        if lang == 'fr':
-            template = env.get_template('password/choose/fr.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        elif lang == 'es':
-            template = env.get_template('password/choose/es.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        elif lang == 'pt':
-            template = env.get_template('password/choose/pt.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        
-        else:
-            template = env.get_template('password/choose/en.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-    return response.json({'message': 'Reset key not found'}, status=404)
 
 
 def _add_class(name, arguments):
