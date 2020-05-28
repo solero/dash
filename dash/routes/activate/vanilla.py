@@ -29,7 +29,7 @@ async def activate_page_autofill(_, lang, code):
         )
         return response.html(page)
     elif lang == 'pt':
-        register_template = env.get_template('pt_vanilla_activation.html')
+        register_template = env.get_template('activate/pt.html')
         page = register_template.render(
             VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY,
@@ -62,7 +62,7 @@ async def activate_page(_, lang):
         )
         return response.html(page)
     elif lang == 'pt':
-        register_template = env.get_template('pt_vanilla_activation.html')
+        register_template = env.get_template('activate/pt.html')
         page = register_template.render(
             VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
             site_key=app.config.GSITE_KEY
