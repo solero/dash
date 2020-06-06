@@ -127,9 +127,9 @@ async def request_password_reset(request, lang):
         )
 
     data = await Penguin.query.where(
-        Penguin.email == email
+        Penguin.username == username
     ).gino.first()
-    if data and data.username == username:
+    if data and data.email == email:
         reset_key = secrets.token_urlsafe(45)
         if lang == 'es':
             mail_template = env.get_template('emails/password/es.html')
