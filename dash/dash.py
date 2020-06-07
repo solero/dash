@@ -10,6 +10,7 @@ from dash.routes.activate.vanilla import vanilla_activate
 from dash.routes.password import password
 from dash.routes.snow.session import session
 from dash.routes.snow.swrequest import swrequest
+from dash.routes.manager import manager
 
 import i18n
 import os
@@ -46,5 +47,6 @@ def main(args):
     app.blueprint(session)
     app.blueprint(swrequest)
     app.blueprint(password)
+    app.blueprint(manager)
 
     app.run(host=app.config.ADDRESS, port=app.config.PORT)
