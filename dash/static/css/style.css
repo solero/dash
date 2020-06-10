@@ -1,0 +1,22 @@
+/* .create-account {
+    border-radius: 5px;
+    box-sizing: content-box;
+    width: 400px;
+    height: 530px;
+    background-color:white;
+    margin: 0 auto;
+  } */
+
+  
+input[type="password"],
+input[type="text"] {
+  width: 40vh; 
+  height: 6vh; 
+  padding: 15px;
+  border: 1px solid #dddddd;;
+  box-sizing:border-box;
+}
+input[type="submit"]{
+  font-size: 2vh;
+}
+  
