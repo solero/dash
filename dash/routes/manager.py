@@ -28,7 +28,7 @@ async def login_page(_):
 @manager.get('/panel')
 async def panel_page(request):
     if 'logged_in' not in request['session']:
-        response.redirect('/')
+        return response.redirect('/')
     else:
         data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
         template = env.get_template('manager/panel.html')
