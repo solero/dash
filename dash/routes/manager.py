@@ -2,6 +2,7 @@ from sanic import Blueprint, response
 from urllib.parse import parse_qs
 from dash import env, app
 from dash.data.penguin import Penguin
+from dash.crypto import Crypto
 from dash.data.moderator import Ban
 from sqlalchemy import func
 from datetime import datetime
@@ -57,7 +58,7 @@ async def login(request):
         return response.html(page)
 
     password_correct = await loop.run_in_executor(None, bcrypt.checkpw,
-                                                  get_login_hash(password).encode('utf-8'),
+                                                  Crypto.get_login_hash(password).encode('utf-8'),
                                                   data.password.encode('utf-8'))
     flood_key = f'{request.ip}.flood'
     if not password_correct:
@@ -127,11 +128,3 @@ async def login(request):
     return response.redirect('/panel')
 
 
-def get_login_hash(password):
-    login_hash = md5(password.encode('utf-8')).hexdigest().upper()
-    login_hash = login_hash[16:32] + login_hash[0:16]
-    login_hash += 'houdini'
-    login_hash += 'Y(02.>\'H}t":E1'
-    login_hash = md5(login_hash.encode('utf-8')).hexdigest()
-    login_hash = login_hash[16:32] + login_hash[0:16]
-    return login_hash
