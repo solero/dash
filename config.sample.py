@@ -155,7 +155,8 @@ PASSWORD_REDIRECT : str
 AUTH_TTL = 3600
 PASSWORD_REDIRECT = ''
 
-
+LOGIN_FAILURE_TIMER = 3600
+LOGIN_FAILURE_LIMIT = 5
 
 
 # For more configuration settings see
