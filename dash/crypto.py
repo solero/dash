@@ -17,15 +17,19 @@ class Crypto:
         return token_hex(8)
 
     @staticmethod
-    def encrypt_password(password):
-        password = Crypto.hash(password)
+    def encrypt_password(password, digest=True):
+        if digest:
+            password = Crypto.hash(password)
+
         swapped_hash = password[16:32] + password[0:16]
         return swapped_hash
 
     @staticmethod
-    def get_login_hash(password):
-        key = Crypto.encrypt_password(password).upper()
-        key += 'houdini'
+    def get_login_hash(password, rndk):
+        key = Crypto.encrypt_password(password, False)
+        key += rndk
         key += 'Y(02.>\'H}t":E1'
+
         login_hash = Crypto.encrypt_password(key)
+
         return login_hash
