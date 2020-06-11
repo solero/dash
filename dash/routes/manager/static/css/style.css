@@ -13,4 +13,14 @@ input[type="submit"]{
 h5{
   color: white;
 }
+
+h6{
+  font-size: 1.25vw;
+}
+
+.table{
+  display: block !important;
+  overflow-x: auto !important;
+  width: 100% !important;
+}
   
