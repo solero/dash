@@ -1,6 +1,7 @@
 from sanic import Blueprint, response
 from dash.routes.manager.login import login, logout, login_auth
 from dash.routes.manager.panel import panel
+from dash.routes.manager.moderation import moderation
 
 import os
 main = Blueprint('main', url_prefix='/')
@@ -9,14 +10,15 @@ static.static('/', os.path.join(os.path.dirname(os.path.abspath(__file__)), './s
 
 manager = Blueprint.group(
     main,
-    panel,
-    logout,
     login,
+    logout,
+    panel,
+    moderation,
     static,
     url_prefix='/manager'
 )
 
-# make crypto back to what it originally was and use that method (check vanilla.py)
+# add search feature on front panel to fill the page
 # web sockets
 
 
