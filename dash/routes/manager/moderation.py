@@ -8,10 +8,10 @@ from dash.routes.manager.login import login_auth
 moderation = Blueprint('moderation', url_prefix='/panel')
 
 
-@moderation.get('/verify/<lang>')
+@moderation.get('/verify')
 @login_auth()
-async def verify_page(request, lang):
-    template = env.get_template('manager/verify.html') # add diff lang in navbar as option
+async def verify_page(request):
+    template = env.get_template('manager/verify.html')
     data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
     unverified_penguins_en = await Penguin.query.where(
         Penguin.approval_en == False
