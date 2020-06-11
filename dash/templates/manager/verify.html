@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="icon" type="image/jpeg" href="">
+        <title>Houdini | Panel</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown hidden-md-down">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Profile
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item">Logged in as <strong> {{ penguin.username }}</strong></a>
+                            <a href="/panel" class="dropdown-item">Go To Panel</a>
+                            <a href="/panel/password" class="dropdown-item">Change Password</a>
+                            <a href="/panel/email" class="dropdown-item">Change Email</a>
+                            <a href="/logout" class="dropdown-item">
+                                <div class="dropdown-divider"></div>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        {% if success_message != '' %}
+        <div class="alert alert-success" role="alert">{{ success_message }}</div>
+        {% endif %}
+        {% if error_message != '' %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+        {% endif %}
+        <br>
+        <h3 class="text-center" style='height: 9vh;'>
+            Verify Players:
+        </h3>
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            {% if language == 'en' %}
+            <a class="nav-item nav-link" id="nav-english-tab" data-toggle="tab" href="#nav-english" role="tab" aria-controls="nav-english" aria-selected="true">English</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-english-tab" data-toggle="tab" href="#nav-english" role="tab" aria-controls="nav-english" aria-selected="false">English</a>
+            {% endif %}
+
+            {% if language == 'de' %}
+            <a class="nav-item nav-link" id="nav-german-tab" data-toggle="tab" href="#nav-german" role="tab" aria-controls="nav-german" aria-selected="true">German</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-german-tab" data-toggle="tab" href="#nav-german" role="tab" aria-controls="nav-german" aria-selected="false">German</a>
+            {% endif %}
+
+            {% if language == 'es' %}
+            <a class="nav-item nav-link" id="nav-spanish-tab" data-toggle="tab" href="#nav-spanish" role="tab" aria-controls="nav-spanish" aria-selected="true">Spanish</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-spanish-tab" data-toggle="tab" href="#nav-spanish" role="tab" aria-controls="nav-spanish" aria-selected="false">Spanish</a>
+            {% endif %}
+
+            {% if language == 'fr' %}
+            <a class="nav-item nav-link" id="nav-french-tab" data-toggle="tab" href="#nav-french" role="tab" aria-controls="nav-french" aria-selected="true">French</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-french-tab" data-toggle="tab" href="#nav-french" role="tab" aria-controls="nav-french" aria-selected="false">French</a>
+            {% endif %}
+
+            {% if language == 'pt' %}
+            <a class="nav-item nav-link" id="nav-portuguese-tab" data-toggle="tab" href="#nav-portuguese" role="tab" aria-controls="nav-portuguese" aria-selected="true">Portuguese</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-portuguese-tab" data-toggle="tab" href="#nav-portuguese" role="tab" aria-controls="nav-portuguese" aria-selected="false">Portuguese</a>
+            {% endif %}
+
+            {% if language == 'pt' %}
+            <a class="nav-item nav-link" id="nav-russian-tab" data-toggle="tab" href="#nav-russian" role="tab" aria-controls="nav-russian" aria-selected="true">Russian</a>
+            {% else %}
+            <a class="nav-item nav-link" id="nav-russian-tab" data-toggle="tab" href="#nav-russian" role="tab" aria-controls="nav-russian" aria-selected="false">Russian</a>
+            {% endif %}
+             
+            </div>
+        </nav>
+        <div class="container text-center d-flex justify-content-center"> 
+            <div class="tab-content" id="nav-tabContent">
+                {% if language == 'en' %}
+                <div class="tab-pane fade show active" id="nav-english" role="tabpanel" aria-labelledby="nav-english-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-english" role="tabpanel" aria-labelledby="nav-english-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_en %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='en'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if language == 'de' %}
+                <div class="tab-pane fade show active" id="nav-german" role="tabpanel" aria-labelledby="nav-german-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-german" role="tabpanel" aria-labelledby="nav-german-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_de %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='de'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if language == 'es' %}
+                <div class="tab-pane fade show active" id="nav-spanish" role="tabpanel" aria-labelledby="nav-spanish-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-spanish" role="tabpanel" aria-labelledby="nav-spanish-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_es %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='es'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if language == 'fr' %}
+                <div class="tab-pane fade show active" id="nav-french" role="tabpanel" aria-labelledby="nav-french-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-french" role="tabpanel" aria-labelledby="nav-french-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_fr %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='fr'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if language == 'pt' %}
+                <div class="tab-pane fade show active" id="nav-portuguese" role="tabpanel" aria-labelledby="nav-portuguese-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-portuguese" role="tabpanel" aria-labelledby="nav-portuguese-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_pt %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='pt'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if language == 'ru' %}
+                <div class="tab-pane fade show active" id="nav-russian" role="tabpanel" aria-labelledby="nav-russian-tab">
+                {% else %}
+                <div class="tab-pane fade" id="nav-russian" role="tabpanel" aria-labelledby="nav-russian-tab">
+                {% endif %}
+                    <br>
+                    <table class="table table-bordered">
+                        <thead>
+
+                        </thead>
+                        <tbody>
+                            {% for penguin in unverified_penguins_ru %}
+                            <tr>
+                                <th scope="row">{{ penguin.username }}</th>
+                                <th scope="row">
+                                    <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                        <input type="hidden" name="language" id="language" value='ru'>
+                                        <input type="submit" value="Verify" class="btn btn-success">
+                                    </form>
+                                </th>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    </body>
+</html>
