@@ -85,3 +85,13 @@ class ActivationKey(db.Model):
     penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True,
                            nullable=False)
     activation_key = db.Column(db.CHAR(255), primary_key=True, nullable=False)
+
+
+class Login(db.Model):
+    __tablename__ = 'login'
+
+    id = db.Column(db.Integer, primary_key=True, server_default=db.text("nextval('\"login_id_seq\"'::regclass)"))
+    penguin_id = db.Column(db.ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, server_default=db.text("now()"))
+    ip_hash = db.Column(db.CHAR(255), nullable=False)
+    minutes_played = db.Column(db.Integer, nullable=False, server_default=db.text("0"))
