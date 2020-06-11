@@ -18,3 +18,34 @@ function check_username() {
         return true
     }
 }
+
+function check_password() {
+    const form = document.forms['profile']
+	if (form['password'].value.length < 5) {
+        password.setCustomValidity("Your password has to be longer than 5 characters!");
+        return false;
+    }
+    else{
+        password.setCustomValidity('');
+    }
+}
+
+function match_password(){
+    const form = document.forms['profile']
+    if (form['password'].value !== form['password_confirm'].value){
+        password_confirm.setCustomValidity("Make sure you entered the same password as before!");
+    }
+    else{
+        password_confirm.setCustomValidity('');
+    }
+}
+
+function match_email(){
+    const form = document.forms['profile']
+    if (form['email'].value !== form['email_confirm'].value){
+        email_confirm.setCustomValidity("Make sure you entered the same email as before!");
+    }
+    else{
+        email_confirm.setCustomValidity('');
+    }
+}
