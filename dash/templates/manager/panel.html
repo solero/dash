@@ -7,82 +7,78 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/css/style.css">
         <link rel="icon" type="image/jpeg" href="">
-        <title>Houdini | Login</title>
+        <title>Houdini | Panel</title>
     </head>
     <body>
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                    <h5>Welcome back, {{ penguin.username }}</h5>
-                    </li>
-                </ul>
-            </div>    
-            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item dropdown hidden-md-down">
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown hidden-md-down">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Profile
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                <a class="dropdown-item">Logged in as <strong> {{ penguin.username }}</strong></a>
+                <a href="/panel/password" class="dropdown-item">Change Password</a>
+                <a href="/panel/email" class="dropdown-item">Change Email</a>
+                <a href="/logout" class="dropdown-item">
+                  <div class="dropdown-divider"></div>
+                  Logout
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      {% if success_message != '' %}
+        <div class="alert alert-success" role="alert">{{ success_message }}</div>
+        {% endif %}
+        {% if error_message != '' %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+        {% endif %}
         <br>
         <div class="container text-center d-flex justify-content-center">
-            <div class="card" style='width: 30vw;'>
-                <img class="card-img-top mx-auto" src="{{ play_link }}/avatar/{{ penguin.id }}/cp?=120" style='width: 10vw;'>
-                <div class="card-body">
-                  <h4 class="card-title">{{ penguin.username }}</h4>
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Account
-                  </button>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                    <h6 class="dropdown-item">ID: {{ penguin.id }}</h6>
-                    <h6 class="dropdown-item">Email: {{ penguin.email }}</h6>
-                    <h6 class="dropdown-item">Coins: {{ penguin.coins }}</h6>
-                    
-                    {% if penguin.moderator %}
-                    <h6 class="dropdown-item">Moderator: Yes</h6>
-                    {% else %}
-                    <h6 class="dropdown-item">Moderator: No</h6>
-                    {% endif %}
-                    <div class="dropdown-divider"></div>
-                    <a href="/panel/password" class="dropdown-item">Change Password</a>
-                    <a href="/panel/email" class="dropdown-item">Change Email</a>
-                    <a href="/panel/delete" class="dropdown-item">Delete Account</a>
-                </div>
-              </div>
-        </div>
-        </div>
-        <br>
-        <div class="container text-center d-flex justify-content-center">
-            {% if penguin.moderator %}
-            <a href='/profile/ticket'>
-                <button class="btn btn-danger mr-1">
-                  <h6 class='card-text text-center'>Ban Player</h6>
-                </button>
-              </a>
-              <a href='/profile/view/tickets'>
-                <button class="btn btn-success mr-1">
-                  <h6 class='card-text text-center'>Unban Player</h6>
-                </button>
-              </a>
-              {% endif %}
-              {% if penguin.admin %}
-              <a href='/profile/email'>
-                <button class="btn btn-primary mr-1">
-                  <h6 class='card-text text-center'>Verify Players</h6>
-                </button>
-              </a>
-            <a href='/profile/email'>
-              <button class="btn btn-primary mr-1">
-                <h6 class='card-text text-center'>Manage Players</h6>
-              </button>
-            </a>
-            {% endif %}
-
-              </div>
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <h3>Welcome back, {{ penguin.username }}</h3>
+      </div>
+      <br>
+      <div class="container text-center d-flex justify-content-center">
+        <a href="/panel/verify/en">
+          <button class="btn btn-success mr-1">
+            <h6 class='card-text text-center'>Verify Usernames</h6>
+          </button>
+        </a>
+        <a href="/panel/manage">
+          <button class="btn btn-success mr-1">
+            <h6 class='card-text text-center'>Manage Players</h6>
+          </button>
+        </a>
+      </div>
+      <br>
+      <div class="container text-center d-flex justify-content-center"> 
+        <h4> Your Login History </h4>
+      </div>
+      <div class="container text-center d-flex justify-content-center"> 
+        <table class="table table-bordered" style='width: 30vw;'>
+          <thead>
+            <tr>
+              <th scope="col" style='font-size: 90%;'>Date:</th>
+              <th scope="col" style='font-size: 90%;'>IP Hash</th>
+              <th scope="col" style='font-size: 90%;'>Minutes Played:</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for login in login_history %}
+            <tr>
+              <th scope="row" style='font-size: 90%;'>{{ login.date }}</th>
+              <th scope="row" style='font-size: 80%;'>{{ login.ip_hash }}</th>
+              <th scope="row" style='font-size: 90%;'>{{ login.minutes_played }}</th>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     </body>
 </html>
