@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="icon" type="image/jpeg" href="">
+        <title>Houdini | Panel</title>
+    </head>
+    <body>
+        {% if success_message != '' %}
+        <div class="alert alert-success" role="alert">{{ success_message }}</div>
+        {% endif %}
+        {% if error_message != '' %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+        {% endif %}
+        <br>
+        <h3 class="text-center" style='height: 9vh;'>
+            Change Email
+        </h3>
+        <div class="container text-center d-flex justify-content-center">
+            <form action="/panel/email" name='profile' method="POST" onsubmit="">
+                <div class='profile' style='max-width: 40vh;'>
+                        <div class="form-group">
+                        <input type="email" class="form-control form-control-sm text-center" name="email" placeholder="Email" required>
+                        <small id="emailHelp" class="form-text text-muted">Your email address will be used in the event when you may forget your password.</small>
+                        </div>
+    
+                        <div class="form-group">
+                            <input type="email" class="form-control form-control-sm text-center" id='email_confirm' name="email_confirm" oninput="match_email();" placeholder="Confirm Email" required>
+                            </div>
+                        <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
+                        <div class="form-group"> 
+                            <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Submit</button>
+                        </div>
+                </div>
+               </form>
+        </div>
+        <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
+        <script>
+        grecaptcha.ready(async function (){
+            const token = await grecaptcha.execute('{{ site_key }}', { 
+                action: 'email' 
+            })
+            const recaptchaResponse = document.getElementById('recaptchaResponse')
+            document.getElementById('recaptchaResponse').value = token
+        })
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <script src="/static/js/checks.js"></script>
+    </body>
+</html>
