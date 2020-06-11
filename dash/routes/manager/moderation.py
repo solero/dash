@@ -53,55 +53,12 @@ async def verify_request(request, penguin_id):
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
     language = post_data.get('language', [None])[0]
-    unverified_penguins_en = await Penguin.query.where(
-        Penguin.approval_en == False
-    ).gino.all()
-    unverified_penguins_de = await Penguin.query.where(
-        Penguin.approval_de == False
-    ).gino.all()
-    unverified_penguins_es = await Penguin.query.where(
-        Penguin.approval_es == False
-    ).gino.all()
-    unverified_penguins_fr = await Penguin.query.where(
-        Penguin.approval_fr == False
-    ).gino.all()
-    unverified_penguins_pt = await Penguin.query.where(
-        Penguin.approval_pt == False
-    ).gino.all()
-    unverified_penguins_ru = await Penguin.query.where(
-        Penguin.approval_ru == False
-    ).gino.all()
     data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
     if not language:
-        page = template.render(
-            success_message="You must pick from a valid language.",
-            error_message='',
-            unverified_penguins_en=unverified_penguins_en,
-            unverified_penguins_de=unverified_penguins_de,
-            unverified_penguins_es=unverified_penguins_es,
-            unverified_penguins_fr=unverified_penguins_fr,
-            unverified_penguins_pt=unverified_penguins_pt,
-            unverified_penguins_ru=unverified_penguins_ru,
-            penguin=data,
-            language='en'
-        )
-        return response.html(page)
+        return response.redirect('/panel/verify')
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not penguin:
-        page = template.render(
-            success_message=f"The penguin ID {penguin_id} does not exist ",
-            error_message='',
-            unverified_penguins_en=unverified_penguins_en,
-            unverified_penguins_de=unverified_penguins_de,
-            unverified_penguins_es=unverified_penguins_es,
-            unverified_penguins_fr=unverified_penguins_fr,
-            unverified_penguins_pt=unverified_penguins_pt,
-            unverified_penguins_ru=unverified_penguins_ru,
-            penguin=data,
-            language=language
-        )
-        return response.html(page)
-
+        return response.redirect('/panel/verify')
     if language == 'en':
         await Penguin.update.values(approval_en=True).where(Penguin.id == penguin.id).gino.status()
     elif language == 'de':
