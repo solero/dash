@@ -147,7 +147,7 @@ async def login_request(request):
         )
         return response.html(page)
     request['session']['username'] = username
-    return response.redirect('/panel')
+    return response.redirect('/manager')
 
 
 def login_auth():
@@ -155,9 +155,9 @@ def login_auth():
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
             if 'username' not in request['session']:
-                return response.redirect('/login')
+                return response.redirect('/manager/login')
             elif request['session']['username'] is None:
-                return response.redirect('/login')
+                return response.redirect('/manager/login')
             return await f(request, *args, **kwargs)
         return decorated_function
     return decorator
@@ -168,4 +168,4 @@ def login_auth():
 async def logout_request(request):
     request['session']['username'] = None
     del request['session']['username']
-    return response.redirect('/login')
+    return response.redirect('/manager/login')
