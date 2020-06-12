@@ -4,7 +4,7 @@ function validate_username(user){
 }
 
 function check_username() {
-    const form = document.forms['login']
+    const form = document.forms['login'] || document.forms['verify']
 	if (validate_username(form['username'].value)) {
         username.setCustomValidity("Your username is not suitable as it includes special characters.")
         return false
