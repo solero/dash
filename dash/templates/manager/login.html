@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="/manager/static/css/style.css">
         <link rel="icon" type="image/jpeg" href="">
         <title>Houdini | Login</title>
     </head>
@@ -21,14 +21,14 @@
             Login
         </h3>
         <div class="container text-center d-flex justify-content-center">
-            <form action="/login" name='login' method="POST" onsubmit="">
+            <form action="/manager/login" name='login' method="POST" onsubmit="">
                 <div class="form-group">
                     <input type="text" class="form-control form-control-sm text-center" id="username" name="username" oninput="check_username();" placeholder="Username" required>
                 </div>
                 <div class="form-group">
                     <input type="password" class="form-control form-control-sm text-center" id="password" name="password" placeholder="Password" required>
                 </div>
-                <div class="form-group"> 
+                <div class="form-group">
                     <button class="btn btn-primary" type="submit">Login</button>
                 </div>
                 <input type="hidden" name="recaptcha_response" id="recaptchaResponse">
@@ -37,8 +37,8 @@
         <script src="https://www.google.com/recaptcha/api.js?render={{ site_key }}"></script>
         <script>
         grecaptcha.ready(async function (){
-            const token = await grecaptcha.execute('{{ site_key }}', { 
-                action: 'login' 
+            const token = await grecaptcha.execute('{{ site_key }}', {
+                action: 'login'
             })
             const recaptchaResponse = document.getElementById('recaptchaResponse')
             document.getElementById('recaptchaResponse').value = token
@@ -47,6 +47,6 @@
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-        <script src="/static/js/checks.js"></script>
+        <script src="/manager/static/js/checks.js"></script>
     </body>
 </html>

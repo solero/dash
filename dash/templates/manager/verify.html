@@ -18,10 +18,10 @@
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item">Logged in as <strong> {{ penguin.username }}</strong></a>
-                            <a href="/panel" class="dropdown-item">Go To Panel</a>
-                            <a href="/panel/password" class="dropdown-item">Change Password</a>
-                            <a href="/panel/email" class="dropdown-item">Change Email</a>
-                            <a href="/logout" class="dropdown-item">
+                            <a href="/manager" class="dropdown-item">Go To Panel</a>
+                            <a href="/manager/password" class="dropdown-item">Change Password</a>
+                            <a href="/manager/email" class="dropdown-item">Change Email</a>
+                            <a href="/manager/logout" class="dropdown-item">
                                 <div class="dropdown-divider"></div>
                                 Logout
                             </a>
@@ -40,64 +40,64 @@
         <h3 class="text-center" style='height: 9vh;'>
             Verify Players:
         </h3>
-          <div class="container text-center d-flex justify-content-center"> 
+          <div class="container text-center d-flex justify-content-center">
                 <h4>Search: </h4>
                 </div>
-                <div class="container text-center d-flex justify-content-center"> 
-                <form action="/panel/verify/search" name='verify' method="POST" style='width: 20vw;' onsubmit=""> 
+                <div class="container text-center d-flex justify-content-center">
+                <form action="/manager/verify/search" name='verify' method="POST" style='width: 20vw;' onsubmit="">
                     <div class="form-group">
                         <input type="text" class="form-control form-control-sm text-center" id="username" name="username" oninput="check_username();" placeholder="Search Username" required>
                         </div>
-                        <div class="form-group"> 
+                        <div class="form-group">
                             <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Search</button>
                         </div>
                         <input type="hidden" name="language" id="language" value='{{ language }}'>
                 </form>
-                
+
                 </div>
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 {% if language == 'en' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/en" role="tab" aria-controls="nav-verify" aria-selected="true">English</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/en" role="tab" aria-controls="nav-verify" aria-selected="true">English</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/en" role="tab" aria-selected="false">English</a>
+                <a class="nav-item nav-link" href="/manager/verify/en" role="tab" aria-selected="false">English</a>
                 {% endif %}
                 {% if language == 'de' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/de" role="tab" aria-controls="nav-verify" aria-selected="true">German</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/de" role="tab" aria-controls="nav-verify" aria-selected="true">German</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/de" role="tab" aria-selected="false">German</a>
+                <a class="nav-item nav-link" href="/manager/verify/de" role="tab" aria-selected="false">German</a>
                 {% endif %}
                 {% if language == 'es' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/es" role="tab" aria-controls="nav-verify" aria-selected="true">Spanish</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/es" role="tab" aria-controls="nav-verify" aria-selected="true">Spanish</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/es" role="tab" aria-selected="false">Spanish</a>
+                <a class="nav-item nav-link" href="/manager/verify/es" role="tab" aria-selected="false">Spanish</a>
                 {% endif %}
                 {% if language == 'fr' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/fr" role="tab" aria-controls="nav-verify" aria-selected="true">French</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/fr" role="tab" aria-controls="nav-verify" aria-selected="true">French</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/fr" role="tab" aria-selected="false">French</a>
+                <a class="nav-item nav-link" href="/manager/verify/fr" role="tab" aria-selected="false">French</a>
                 {% endif %}
                 {% if language == 'pt' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/pt" role="tab" aria-controls="nav-verify" aria-selected="true">Portuguese</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/pt" role="tab" aria-controls="nav-verify" aria-selected="true">Portuguese</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/pt" role="tab" aria-selected="false">Portuguese</a>
+                <a class="nav-item nav-link" href="/manager/verify/pt" role="tab" aria-selected="false">Portuguese</a>
                 {% endif %}
                 {% if language == 'ru' %}
-                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/panel/verify/ru" role="tab" aria-controls="nav-verify" aria-selected="true">Russian</a>
+                <a class="nav-item nav-link show active" id="nav-verify-tab" data-toggle="tab" href="/manager/verify/ru" role="tab" aria-controls="nav-verify" aria-selected="true">Russian</a>
                 {% else %}
-                <a class="nav-item nav-link" href="/panel/verify/ru" role="tab" aria-selected="false">Russian</a>
+                <a class="nav-item nav-link" href="/manager/verify/ru" role="tab" aria-selected="false">Russian</a>
                 {% endif %}
             </div>
         </nav>
-        <div class="container text-center d-flex justify-content-center"> 
+        <div class="container text-center d-flex justify-content-center">
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-verify" role="tabpanel" aria-labelledby="nav-verify-tab"> 
+                <div class="tab-pane fade show active" id="nav-verify" role="tabpanel" aria-labelledby="nav-verify-tab">
                     <br>
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         {% for page_number in unverified_penguins %}
                         {% if page_number == 1 %}
-                            <a class="nav-item nav-link active" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="true"> 
+                            <a class="nav-item nav-link active" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="true">
                                 {{ page_number }}
                             </a>
                         {% else %}
@@ -126,13 +126,13 @@
                                                   </button>
                                             </th>
                                             <th scope="row">
-                                                <form action="/panel/verify/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                                <form action="/manager/verify/approve/{{ penguin.id }}" name='verify' method="POST" onsubmit="">
                                                     <input type="hidden" name="language" id="language" value='{{ language }}'>
                                                     <input type="submit" value="Approve" class="btn btn-success">
                                                 </form>
                                             </th>
                                             <th scope="row">
-                                                <form action="/panel/reject/{{ penguin.id }}" name='verify' method="POST" onsubmit=""> 
+                                                <form action="/manager/verify/reject/{{ penguin.id }}" name='verify' method="POST" onsubmit="">
                                                     <input type="hidden" name="language" id="language" value='{{ language }}'>
                                                     <input type="submit" value="Reject" class="btn btn-danger">
                                                 </form>
@@ -152,6 +152,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="/static/js/checks.js"></script>
+    <script src="/manager/static/js/checks.js"></script>
     </body>
 </html>

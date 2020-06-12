@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="/manager/static/css/style.css">
         <link rel="icon" type="image/jpeg" href="">
         <title>Houdini | Panel</title>
     </head>
@@ -19,9 +19,9 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
                 <a class="dropdown-item">Logged in as <strong> {{ penguin.username }}</strong></a>
-                <a href="/panel/password" class="dropdown-item">Change Password</a>
-                <a href="/panel/email" class="dropdown-item">Change Email</a>
-                <a href="/logout" class="dropdown-item">
+                <a href="/manager/password" class="dropdown-item">Change Password</a>
+                <a href="/manager/email" class="dropdown-item">Change Email</a>
+                <a href="/manager/logout" class="dropdown-item">
                   <div class="dropdown-divider"></div>
                   Logout
                 </a>
@@ -42,12 +42,12 @@
       </div>
       <br>
       <div class="container text-center d-flex justify-content-center">
-        <a href="/panel/verify/en">
+        <a href="/manager/verify/en">
           <button class="btn btn-success mr-1">
             <h6 class='card-text text-center'>Verify Usernames</h6>
           </button>
         </a>
-        <a href="/panel/manage">
+        <a href="/manager/manage">
           <button class="btn btn-success mr-1">
             <h6 class='card-text text-center'>Manage Players</h6>
           </button>
