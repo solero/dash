@@ -23,7 +23,6 @@ import random
 import base64
 
 vanilla_create = Blueprint('vanilla_create', url_prefix='/create/vanilla')
-vanilla_activate = Blueprint('vanilla_activate', url_prefix='/activate/vanilla')
 
 all_captchas = [
     ('balloon', Image.open('./dash/templates/images/balloon.png')),
