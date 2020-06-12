@@ -18,9 +18,6 @@ manager = Blueprint.group(
     url_prefix='/manager'
 )
 
-# add search feature on front panel to fill the page
-# web sockets
-
 
 @main.get('/')
 @login_auth()
