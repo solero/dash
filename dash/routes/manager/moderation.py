@@ -121,7 +121,7 @@ async def approve_request(request, penguin_id):
     if not penguin:
         return response.redirect(f'/panel/verify/{language}')
     if language == 'en':
-        await Penguin.update.values(approval_ru=True).where(Penguin.id == penguin.id).gino.status()
+        await Penguin.update.values(approval_en=True).where(Penguin.id == penguin.id).gino.status()
         unverified_penguins = await Penguin.query.where(
             (Penguin.approval_en == False) & (Penguin.rejection_en == False)
         ).gino.all()
