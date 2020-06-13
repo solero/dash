@@ -1,0 +1,615 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="icon" type="image/jpeg" href="">
+        <title>Houdini | Panel</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown hidden-md-down">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Profile
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item">Logged in as <strong> {{ penguin.username }}</strong></a>
+                            <a href="/manager" class="dropdown-item">Go To Panel</a>
+                            <a href="/manager/password" class="dropdown-item">Change Password</a>
+                            <a href="/manager/email" class="dropdown-item">Change Email</a>
+                            <a href="/manager/logout" class="dropdown-item">
+                                <div class="dropdown-divider"></div>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        {% if success_message != '' %}
+        <div class="alert alert-success" role="alert">{{ success_message }}</div>
+        {% endif %}
+        {% if error_message != '' %}
+        <div class="alert alert-danger" role="alert">{{ error_message }}</div>
+        {% endif %}
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <div class="card mb-3" style="max-width: 400px;">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <img src='{{ play_link }}/avatar/{{ player.id }}/cp?=120' class="card-img">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        {{ player.username }}
+                                    </h5>
+                                    {% if player.moderator %}
+                                    <p class="card-text">
+                                        Staff
+                                    </p>
+                                    {% else %}
+                                    <p class="card-text">
+                                        Standard
+                                    </p>
+                                    {% endif %}
+                                    <form action="/manager/manage/edit" name='edit_ban' method="POST" onsubmit="">
+                                        <div class="container text-center d-flex justify-content-center"> 
+                                            <div class='login' style='max-width: 40vh;'>
+                                                <div class="form-group"> 
+                                                    {% if player.permaban %}
+                                                    <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Unban</button>
+                                                    {% else %}
+                                                    <button class="btn btn-danger" style='font-size: 2vh;'type="submit">Permanently Ban</button>
+                                                    {% endif %}
+                                                </div>
+                                                {% if player.permaban %}
+                                                <input type="hidden" name="type" id="type" value='unban'>
+                                                {% else %}
+                                                <input type="hidden" name="type" id="type" value='permaban'>
+                                                {% endif %}
+                                                <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav>
+            <div class="container text-center d-flex justify-content-center">
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-summary-tab" data-toggle="tab" href="#nav-summary" role="tab" aria-controls="nav-home" aria-selected="true">
+                        Summary
+                    </a>
+                    <a class="nav-item nav-link" id="nav-ban-tab" data-toggle="tab" href="#nav-ban" role="tab" aria-controls="nav-ban" aria-selected="false">
+                        Bans
+                    </a>
+                    <a class="nav-item nav-link" id="nav-connection-tab" data-toggle="tab" href="#nav-connection" role="tab" aria-controls="nav-connection" aria-selected="false">
+                        Connection History
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <br>
+        <div class="tab-content" id="nav-tabContent">
+            <br>
+            <div class="tab-pane fade show active" id="nav-summary" role="tabpanel" aria-labelledby="nav-summary-tab">
+                <div class="row">
+                    <div class="table-responsive col-md-6">
+                        <div class="container text-center d-flex justify-content-center">
+                        <strong> Information: </strong>
+                    </div>
+                    <div class="container text-center d-flex justify-content-center"> 
+                        <table class="table table-bordered" style="width: 50vw;">
+                            <tr>
+                                <td>
+                                    ID:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.id }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_id' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control form-control-sm text-center" oninput="check_id();" id="id" name="id" placeholder="Update ID" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='id'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Username:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.username }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_username' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control form-control-sm text-center" oninput="check_username();" id="username" name="username" placeholder="Update Username" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='username'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Screen Name:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.nickname }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_nickname' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control form-control-sm text-center" oninput="check_nickname();" id="nickname" name="nickname" placeholder="Update Nickname" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='nickname'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Password:
+                                </td>
+                                <td>
+                                    
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_password' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="password" class="form-control form-control-sm text-center" id="password" name="password" placeholder="Update Password" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='password'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Email:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.email }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_email' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="email" class="form-control form-control-sm text-center" id="email" name="email" placeholder="Update Email" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='email'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Registration Date:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.registration_date }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Coins:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ player.coins }}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_coins' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">
+                                                                <input type="text" class="form-control form-control-sm text-center" oninput="check_coins();" id="coins" name="coins" placeholder="Update Coins" required>
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Update</button>
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='coins'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Is Moderator:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {% if player.moderator %}
+                                        Yes
+                                        {% else %}
+                                        No
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                                <td>
+                                    <ul class="navbar-nav ml-auto">
+                                        <li class="nav-item dropdown hidden-md-down">
+                                            <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                              Edit
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                                                <form action="/manager/manage/edit" name='edit_coins' method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group"> 
+                                                                {% if player.moderator %}
+                                                                <button class="btn btn-danger" style='font-size: 2vh;'type="submit">Demote</button>
+                                                                {% else %}
+                                                                <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Promote</button>
+                                                                {% endif %}
+                                                            </div>
+                                                            <input type="hidden" name="type" id="type" value='moderator'>
+                                                            <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Is Permanently Banned:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {% if player.permaban %}
+                                        Yes
+                                        {% else %}
+                                        No
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {% if latest_ban %}
+                <div class="table-responsive col-md-6">    
+                    <strong> 
+                        Latest Ban: 
+                    </strong>
+                    <table class="table table-bordered" style="width: 40vw;">
+                        <tr>
+                            <td>
+                                Hours left:
+                            </td>
+                            <td>      
+                                <strong>
+                                    {{ latest_ban.hours_left }}
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Occured:
+                            </td>    
+                            <td>    
+                                <strong>
+                                    {{ latest_ban.issued }}
+                                </strong>    
+                            </td>
+                        </tr>
+                            <tr>
+                                <td>
+                                    Placed By:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ latest_ban.moderator }}
+                                    </strong>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Expires:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ latest_ban.expires }}
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Comment:
+                                </td>
+                                <td>
+                                    <strong>
+                                        {{ latest_ban.comment }}
+                                    </strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="table-responsive col-md-6">
+                        <strong> 
+                            Latest Ban: 
+                        </strong>
+                        <table class="table table-bordered" style="width: 40vw;">
+                            <tr>
+                                <td>
+                                    Ban:
+                                </td>
+                                <td>
+                                    <strong>
+                                        N/A (none)
+                                    </strong>
+                                </td>
+                            </tr>                        
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="nav-ban" role="tabpanel" aria-labelledby="nav-ban-tab">
+               <ul class="navbar-nav ml-auto">
+                <div class="container text-center d-flex justify-content-center"> 
+                    <li class="nav-item dropdown hidden-md-down">
+                        <a class="nav-link dropdown-toggle" style='display: inline-block;' href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Insert Ban
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-center" aria-labelledby="navbarDropdownMenuLink">
+                            <form action="/manager/manage/ban" name='edit_nickname' method="POST" onsubmit="">
+                                <div class="container text-center d-flex justify-content-center"> 
+                                    <div class='login' style='max-width: 30vh;'>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control form-control-sm text-center" oninput="check_hours();" id="hours" name="hours" placeholder="Enter Hours" required>
+                                            <br>
+                                            <input type="text" class="form-control form-control-sm text-center" id="comment" name="comment" placeholder="Enter Comment" required>
+                                        </div>
+                                        <div class="form-group"> 
+                                            <button class="btn btn-primary" style='font-size: 2vh;'type="submit">Submit</button>
+                                        </div>
+                                        <input type="hidden" name="player" id="player" value='{{ player.id }}'>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                </div>
+                </ul>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    {% for page_number in bans %}
+                    {% if page_number == 1 %}
+                        <a class="nav-item nav-link active" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="true">
+                            {{ page_number }}
+                        </a>
+                    {% else %}
+                        <a class="nav-item nav-link" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="false">
+                            {{ page_number }}
+                        </a>
+                    {% endif %}
+                    {% endfor %}
+                    </div>
+                    <br>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                {% for page_number in bans %}
+                {% if page_number == 1 %}
+                    <div class="tab-pane fade show active" id="page_{{ page_number }}" role="tabpanel" aria-labelledby="page_{{ page_number }}-tab">
+                {% else %}
+                        <div class="tab-pane fade" id="page_{{ page_number }}" role="tabpanel" aria-labelledby="page_{{ page_number }}-tab">
+                {% endif %}
+                {% for ban in bans[page_number] %}
+                            <div class="container text-center d-flex justify-content-center"> 
+                                <table class="table table-bordered" style='width: 30vw;'>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" style='font-size: 90%;'>Issued:</th>
+                                            <th scope="col" style='font-size: 90%;'>Expiry</th>
+                                            <th scope="col" style='font-size: 90%;'>Moderator ID</th>
+                                            <th scope="col" style='font-size: 90%;'>Comment</th>
+                                            <th scope="col" style='font-size: 90%;'>Remove Ban</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" style='font-size: 90%;'>{{ ban.issued }}</th>
+                                            <th scope="row" style='font-size: 80%;'>{{ ban.expires }}</th>
+                                            <th scope="row" style='font-size: 90%;'>{{ ban.moderator_id }}</th>
+                                            <th scope="row" style='font-size: 90%;'>{{ ban.comment }}</th>
+                                            <th scope="row" style='font-size: 90%;'>
+                                                <form action="/manager/manage/unban" method="POST" onsubmit="">
+                                                    <div class="container text-center d-flex justify-content-center"> 
+                                                        <div class='login' style='max-width: 40vh;'>
+                                                            <div class="form-group">                                        
+                                                                <button class="btn btn-danger" style='font-size: 2vh;'type="submit">Unban</button>
+                                                            </div>
+                                                            <input type="hidden" name="comment" id="comment" value='{{ latest_ban.comment }}'>
+                                                            <input type="hidden" name="player" id="player" value='{{ latest_ban.penguin_id }}'>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                    {% endfor %}
+                        </div>
+                    {% endfor %}
+                    </div>    
+                </div>
+                <div class="tab-pane fade" id="nav-connection" role="tabpanel" aria-labelledby="nav-connection-tab">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        {% for page_number in connection_history %}
+                        {% if page_number == 1 %}
+                            <a class="nav-item nav-link active" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="true">
+                                {{ page_number }}
+                            </a>
+                        {% else %}
+                            <a class="nav-item nav-link" id="page_{{ page_number }}-tab" data-toggle="tab" href="#page_{{ page_number }}" role="tab" aria-controls="page_{{ page_number }}" aria-selected="false">
+                                {{ page_number }}
+                            </a>
+                        {% endif %}
+                        {% endfor %}
+                        </div>
+                        <br>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                    {% for page_number in connection_history %}
+                    {% if page_number == 1 %}
+                        <div class="tab-pane fade show active" id="page_{{ page_number }}" role="tabpanel" aria-labelledby="page_{{ page_number }}-tab">
+                    {% else %}
+                            <div class="tab-pane fade" id="page_{{ page_number }}" role="tabpanel" aria-labelledby="page_{{ page_number }}-tab">
+                    {% endif %}
+                    {% for login in connection_history[page_number] %}
+                                <div class="container text-center d-flex justify-content-center"> 
+                                    <table class="table table-bordered" style='width: 30vw;'>
+                                        <thead>
+                                          <tr>
+                                            <th scope="col" style='font-size: 90%;'>Date:</th>
+                                            <th scope="col" style='font-size: 90%;'>IP Hash</th>
+                                            <th scope="col" style='font-size: 90%;'>Minutes Played:</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>                                        
+                                          <tr>
+                                            <th scope="row" style='font-size: 90%;'>{{ login.date }}</th>
+                                            <th scope="row" style='font-size: 80%;'>{{ login.ip_hash }}</th>
+                                            <th scope="row" style='font-size: 90%;'>{{ login.minutes_played }}</th>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                </div>
+                        {% endfor %}
+                            </div>
+                        {% endfor %}
+                        </div>    
+                    </div>
+        </div>
+    </div>   
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="/manager/static/js/checks.js"></script>
+    </body>
+</html>

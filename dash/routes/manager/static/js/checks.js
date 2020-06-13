@@ -4,7 +4,7 @@ function validate_username(user){
 }
 
 function check_username() {
-    const form = document.forms['login'] || document.forms['verify']
+    const form = document.forms['login'] || document.forms['verify'] || document.forms['edit_username']
 	if (validate_username(form['username'].value)) {
         username.setCustomValidity("Your username is not suitable as it includes special characters.")
         return false
@@ -16,6 +16,45 @@ function check_username() {
     else{
         username.setCustomValidity('')
         return true
+    }
+}
+
+function check_nickname(){
+
+    const form = document.forms['edit_nickname']
+    if (validate_username(form['nickname'].value)) {
+        nickname.setCustomValidity("Your nickname is not suitable as it includes special characters.")
+        return false
+    }
+    else if(form['nickname'].value.length < 1 || form['nickname'].value.length > 30){
+        nickname.setCustomValidity("Your nickname is not suitable, it has to be between 1-30 characters.")
+        return false
+    }
+    else{
+        nickname.setCustomValidity('')
+        return true
+    }
+}
+
+function check_id(){
+    const form = document.forms['edit_id']
+    if(isNaN(form['id'].value)){
+        id.setCustomValidity('The ID must be a number')
+        return false
+    }
+    else{
+        id.setCustomValidity('')
+    }
+}
+
+function check_coins(){
+    const form = document.forms['edit_coins']
+    if(isNaN(form['coins'].value)){
+        coins.setCustomValidity('The coin amount must be a number')
+        return false
+    }
+    else{
+        coins.setCustomValidity('')
     }
 }
 

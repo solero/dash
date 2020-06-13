@@ -1,5 +1,6 @@
 from dash.routes.manager.login import login, logout, login_auth
 from dash.routes.manager.verification import verification
+from dash.routes.manager.moderation import moderation
 from dash import env, app
 from sqlalchemy import func
 from email.utils import parseaddr
@@ -25,12 +26,10 @@ manager = Blueprint.group(
     login,
     logout,
     verification,
+    moderation,
     static,
     url_prefix='/manager'
 )
-# change routes so it can load off i.e. existing subdomain & new subdomain
-# manage penguins
-# web sockets
 
 
 @panel.get('')
@@ -237,6 +236,5 @@ async def email_request(request):
         site_key=app.config.GSITE_KEY
     )
     return response.html(page)
-
 
 

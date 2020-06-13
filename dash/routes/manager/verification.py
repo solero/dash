@@ -4,7 +4,6 @@ from urllib.parse import parse_qs
 from sqlalchemy import func
 from dash.data.penguin import Penguin
 from dash.routes.manager.login import login_auth
-
 verification = Blueprint('verification', url_prefix='/verify')
 
 
@@ -65,7 +64,9 @@ async def search_username(request):
     language = post_data.get('language', [None])[0]
     data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
     if not language:
-        return response.redirect(f'/manager/verify/en')
+        return response.text('You must provide a valid language.')
+    elif not username:
+        return response.text('You must provide a valid username.')
     if language == 'en':
         unverified_penguins = await Penguin.query.where(
             (Penguin.approval_en == False) & (Penguin.rejection_en == False)
@@ -104,7 +105,7 @@ async def search_username(request):
         ).gino.all()
     unverified_penguins = get_paginated_result(unverified_penguins)
     page = template.render(
-        success_message=f"Searched usernames similar to {username}",
+        success_message=f"Searched usernames similar to {username}.",
         error_message='',
         unverified_penguins=unverified_penguins,
         penguin=data,
@@ -123,9 +124,9 @@ async def approve_request(request, penguin_id):
     data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:
-        return response.redirect(f'/manager/verify/en')
+        return response.text('You must provide a valid language.')
     if not penguin:
-        return response.redirect(f'/manager/verify/{language}')
+        return response.text('You must provide a valid penguin ID.')
     if language == 'en':
         await Penguin.update.values(approval_en=True).where(Penguin.id == penguin.id).gino.status()
         unverified_penguins = await Penguin.query.where(
@@ -182,9 +183,9 @@ async def reject_request(request, penguin_id):
     data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:
-        return response.redirect(f'/manager/verify/en')
+        return response.text('You must provide a valid language.')
     if not penguin:
-        return response.redirect(f'/manager/verify/{language}')
+        return response.text('You must provide a valid penguin ID.')
     if language == 'en':
         await Penguin.update.values(rejection_en=True).where(Penguin.id == penguin.id).gino.status()
         unverified_penguins = await Penguin.query.where(
@@ -231,21 +232,22 @@ async def reject_request(request, penguin_id):
     return response.html(page)
 
 
-def get_paginated_result(unverified_penguins):
-    all_unverified_penguins = {}
+def get_paginated_result(results):
+    paginated_results = {}
     current_count = 0
     pagination_limit = current_count + 10
     page = 1
-    for unverified_penguin in unverified_penguins:
+    for result in results:
         if current_count == 0:
-            all_unverified_penguins[page] = []
-            all_unverified_penguins[page].append(unverified_penguin)
+            paginated_results[page] = []
+            paginated_results[page].append(result)
         elif current_count == pagination_limit:
             page += 1
             pagination_limit = current_count + 10
-            all_unverified_penguins[page] = []
-            all_unverified_penguins[page].append(unverified_penguin)
+            paginated_results[page] = []
+            paginated_results[page].append(result)
         else:
-            all_unverified_penguins[page].append(unverified_penguin)
+            paginated_results[page].append(result)
         current_count += 1
-    return all_unverified_penguins
+    return paginated_results
+
