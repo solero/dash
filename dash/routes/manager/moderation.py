@@ -512,6 +512,8 @@ async def search_player(request):
     elif search_type is None:
         return response.text('You must provide a valid search type.')
     if search_type == 'id':
+        if not search_query.isdigit():
+            return response.text('The ID given must be a number.')
         penguins = await Penguin.query.where(
             (Penguin.id == int(search_query))
         ).order_by(Penguin.registration_date.desc()).gino.all()
