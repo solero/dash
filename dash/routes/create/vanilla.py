@@ -174,7 +174,7 @@ async def _validate_registration(request, post_data, lang):
             },
             status=403
         )
-    elif not color.isdigit() or int(color) not in range(1, 16):
+    elif not color.isdigit() or int(color) not in range(1, 17):
         return response.json(
             {
                 'message': '403 Forbidden'
