@@ -26,8 +26,8 @@ valid_sizes = [
 
 @avatar.get('/<penguin_id:int>')
 async def get_avatar(request, penguin_id: int):
-    background = request.raw_args.get('photo', 'true')
-    size = request.raw_args.get('size', 120)
+    background = request.args.get('photo', 'true')
+    size = request.args.get('size', 120)
     if int(size) not in valid_sizes:
         return response.json({"message": 'Invalid size'}, status=400)
 
