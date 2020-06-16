@@ -210,7 +210,7 @@ location /social/autocomplete/v2/search/suggestions {
 
 # server_name secured.clubpenguin.com
 location /manager {
-    proxy_pass http://dash:3000/manager;
+    proxy_pass http://localhost:3000/manager;
     proxy_redirect off;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
