@@ -19,9 +19,9 @@ autocomplete_models = {
 
 @autocomplete.post('/')
 async def complete(request):
-    lang = request.raw_args.get('language', 'en')
-    query = request.raw_args.get('text')
-    limit = request.raw_args.get('limit', 7)
+    lang = request.args.get('language', 'en')
+    query = request.args.get('text')
+    limit = request.args.get('limit', 7)
     model = autocomplete_models.get(lang, autocomplete_models['en'])
 
     if any(stop in query for stop in ['.', '?', '!']):
