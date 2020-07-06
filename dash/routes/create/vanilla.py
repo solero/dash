@@ -149,7 +149,9 @@ async def register(request, lang):
     
 
 async def _validate_registration(request, post_data, lang):
-    username = post_data.get('name', [None])[0].strip()
+    username = post_data.get('name', [None])[0]
+    if username:
+        username = username.strip()
     password = post_data.get('pass', [None])[0] 
     email = post_data.get('email', [None])[0]
     color = post_data.get('color', [None])[0]  
@@ -239,7 +241,9 @@ async def _validate_registration(request, post_data, lang):
 
 
 async def _validate_username(request, post_data, lang):
-    username = post_data.get('name', [None])[0].strip()
+    username = post_data.get('name', [None])[0]
+    if username:
+        username = username.strip()
     if not username:
         request['session']['errors']['name'] = True
         return response.json(
