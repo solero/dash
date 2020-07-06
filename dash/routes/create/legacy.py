@@ -48,7 +48,9 @@ async def validate_agreement(_, post_data):
 
 
 async def validate_username(request, post_data):
-    username = post_data.get('username', [None])[0].strip()
+    username = post_data.get('username', [None])[0]
+    if username:
+        username = username.strip()
     color = post_data.get('colour')[0]
     lang = post_data.get('lang')[0]
 
@@ -103,7 +105,9 @@ async def validate_username(request, post_data):
 async def validate_password_email(request, post_data):
     session_id = post_data.get('sid')[0]
     session = request['session']
-    username = session.get('username', None).strip()
+    username = session.get('username', None)
+    if username:
+        username = username.strip()
     color = session.get('color', None)
     password = post_data.get('password')[0]
     password_confirm = post_data.get('password_confirm')[0]
