@@ -93,8 +93,8 @@ async def choose_password_page(_, lang, reset_token):
 async def request_password_reset(request, lang):
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
-    username = post_data.get('name', [None])[0]
-    email = post_data.get('email', [None])[0]
+    username = post_data.get('name', [None])[0].lower()
+    email = post_data.get('email', [None])[0].lower()
     if app.config.GSECRET_KEY:
         gclient_response = post_data.get('recaptcha_response', [None])[0]
         async with aiohttp.ClientSession() as session:
