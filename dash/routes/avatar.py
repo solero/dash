@@ -43,8 +43,9 @@ async def get_avatar(request, penguin_id: int):
 
     loop = asyncio.get_event_loop()
     try:
-        image = await loop.run_in_executor(None, build_avatar, clothing, int(size))
-    except:
+        future = loop.run_in_executor(None, build_avatar, clothing, int(size))
+        image = await asyncio.wait_for(future, timeout=5.0, loop=loop)
+    except asyncio.TimeoutError:
         return response.json({"message": "Something has gone wrong."}, status=500)
     return response.raw(image, headers={'Content-type': 'image/png'})
 
