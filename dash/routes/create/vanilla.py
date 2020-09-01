@@ -158,6 +158,8 @@ async def _validate_registration(request, lang):
     password = Crypto.get_login_hash(password, rndk=app.config.STATIC_KEY)
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
 
+    username = username.strip()
+
     if app.config.USERNAME_FORCE_CASE:
         username = username.title()
 
@@ -193,8 +195,8 @@ async def _validate_registration(request, lang):
     return response.redirect(app.config.VANILLA_PLAY_LINK)
 
 
-async def _validate_username(request, post_data, lang):
-    username = post_data.get('name', [None])[0].strip()
+async def _validate_username(request, lang):
+    username = request.form.get('name', None)
     if not username:
         request['session']['errors']['name'] = True
         return response.json(
@@ -208,8 +210,9 @@ async def _validate_username(request, post_data, lang):
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    elif len(username) < 4 or len(username) > 12:
-        request['session']['errors']['name'] = True
+
+    username = username.strip()
+    if len(username) < 4 or len(username) > 12:
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_short', locale=lang)), 

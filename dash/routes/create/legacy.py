@@ -51,7 +51,9 @@ async def validate_username(request):
         return response.text(urlencode({
             'error': i18n.t('create.name_missing', locale=lang)
         }))
-    elif len(username) < 4 or len(username) > 12:
+    
+    username = username.strip()
+    if len(username) < 4 or len(username) > 12:
         return response.text(urlencode({
             'error': i18n.t('create.name_short', locale=lang)
         }))
@@ -156,6 +158,7 @@ async def validate_password_email(request):
     password = Crypto.get_login_hash(password, rndk=app.config.STATIC_KEY)
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
 
+    username = username.strip()
     if app.config.USERNAME_FORCE_CASE:
         username = username.title()
 
