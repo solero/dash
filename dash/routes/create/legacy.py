@@ -101,10 +101,10 @@ async def validate_password_email(request):
     session_id = request.form.get('sid')
     username = request.ctx.session.get('username', None)
     color = request.ctx.session.get('color', '0')
-    password = request.form.get('password')
-    password_confirm = request.form.get('password_confirm')
-    email = request.form.get('email')
-    lang = request.form.get('lang')
+    password = request.form.get('password', '')
+    password_confirm = request.form.get('password_confirm', '')
+    email = request.form.get('email', '')
+    lang = request.form.get('lang', 'en')
 
     if session_id != request.ctx.session.get('sid'):
         return response.text(urlencode({
