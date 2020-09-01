@@ -90,11 +90,11 @@ async def validate_username(request):
             'error': i18n.t('create.name_suggest', suggestion=username, locale=lang)
         }))
 
-    request['session']['sid'] = secrets.token_urlsafe(16)
-    request['session']['username'] = username
-    request['session']['color'] = color
+    request.ctx.session['sid'] = secrets.token_urlsafe(16)
+    request.ctx.session['username'] = username
+    request.ctx.session['color'] = color
 
-    return response.text(urlencode({'success': 1, 'sid': request['session']['sid']}))
+    return response.text(urlencode({'success': 1, 'sid': request.ctx.session['sid']}))
 
 
 async def validate_password_email(request):
@@ -106,7 +106,7 @@ async def validate_password_email(request):
     email = request.form.get('email')
     lang = request.form.get('lang')
 
-    if session_id != session['sid']:
+    if session_id != request.ctx.session.get('sid'):
         return response.text(urlencode({
             'error': i18n.t('create.passwords_match', locale=lang)
         }))

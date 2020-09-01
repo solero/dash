@@ -40,15 +40,15 @@ async def create_page(request, lang):
     captcha_answer = random.choice(captchas)[0]
     captcha_object = [captcha for captcha in captchas if captcha_answer in captcha]
 
-    if 'anon_token' not in request['session']:
+    if 'anon_token' not in request.ctx.session:
         anon_token = secrets.token_urlsafe(32)
-        request['session']['anon_token'] = anon_token
+        request.ctx.session['anon_token'] = anon_token
 
-    request['session']['captcha_answer'] = captchas.index(captcha_object[0])
-    request['session']['captcha'] = {
+    request.ctx.session['captcha_answer'] = captchas.index(captcha_object[0])
+    request.ctx.session['captcha'] = {
         'passed': 0
     }
-    request['session']['errors'] = {
+    request.ctx.session['errors'] = {
         'name': True,
         'pass': True,
         'email': True,
@@ -56,10 +56,10 @@ async def create_page(request, lang):
         'captcha': True
     }
 
-    request['session']['captcha_answer'] = captchas.index(captcha_object[0])
+    request.ctx.session['captcha_answer'] = captchas.index(captcha_object[0])
     
     for captcha_image in captchas:
-        captcha_encoded = lsb.hide(captcha_image[1].copy(), request['session']['anon_token'])
+        captcha_encoded = lsb.hide(captcha_image[1].copy(), request.ctx.session['anon_token'])
         buffered = BytesIO()
         captcha_encoded.save(buffered, format='PNG')
         captcha_base64 = base64.b64encode(buffered.getvalue())
@@ -83,14 +83,13 @@ async def register(request, lang):
     trigger = request.form.get('_triggering_element_name', None)
     anon_token = request.form.get('anon_token', None)
     if 'anon_token' not in request.ctx.session:
-    if 'anon_token' not in request['session']:
         return response.json(
             {
                 'message': '403 Forbidden'
             },
             status=403
         )
-    elif not anon_token or request['session']['anon_token'] != anon_token:
+    elif not anon_token or request.ctx.session['anon_token'] != anon_token:
         return response.json(
             {
                 'message': '403 Forbidden'
@@ -115,21 +114,21 @@ async def _validate_registration(request, lang):
     password = request.form.get('pass', None)
     email = request.form.get('email', None)
     color = request.form.get('color', None)
-    if 'username' not in request['session'] or request['session']['username'] != username:
+    if 'username' not in request.ctx.session or request.ctx.session['username'] != username:
         return response.json(
             {
                 'message': '403 Forbidden'
             },
             status=403
         )
-    elif 'password' not in request['session'] or request['session']['password'] != password:
+    elif 'password' not in request.ctx.session or request.ctx.session['password'] != password:
         return response.json(
             {
                 'message': '403 Forbidden'
             },
             status=403
         )
-    elif 'email' not in request['session'] or request['session']['email'] != email:
+    elif 'email' not in request.ctx.session or request.ctx.session['email'] != email:
         return response.json(
             {
                 'message': '403 Forbidden'
@@ -198,13 +197,13 @@ async def _validate_registration(request, lang):
 async def _validate_username(request, lang):
     username = request.form.get('name', None)
     if not username:
-        request['session']['errors']['name'] = True
+        request.ctx.session['errors']['name'] = True
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_missing', locale=lang)), 
                 _remove_class('name', 'valid'),
                 _add_class('name', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
@@ -213,51 +212,52 @@ async def _validate_username(request, lang):
 
     username = username.strip()
     if len(username) < 4 or len(username) > 12:
+        request.ctx.session['errors']['name'] = True
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_short', locale=lang)), 
                 _remove_class('name', 'valid'),
                 _add_class('name', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
     elif len(re.sub('[^0-9]', '', username)) > 5:
-        request['session']['errors']['name'] = True
+        request.ctx.session['errors']['name'] = True
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_number', locale=lang)), 
                 _remove_class('name', 'valid'),
                 _add_class('name', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
     elif re.search('[a-zA-Z]', username) is None:
-        request['session']['errors']['name'] = True
+        request.ctx.session['errors']['name'] = True
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_letter', locale=lang)), 
                 _remove_class('name', 'valid'),
                 _add_class('name', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
     elif not all(letter.isalnum() or letter.isspace() for letter in username):
-        request['session']['errors']['name'] = True
+        request.ctx.session['errors']['name'] = True
         return response.json(
             [
                 _make_error_message('name', i18n.t('create.name_not_allowed', locale=lang)), 
                 _remove_class('name', 'valid'),
                 _add_class('name', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
@@ -267,7 +267,7 @@ async def _validate_username(request, lang):
     names = await db.select([Penguin.username]).where(Penguin.username.like(f'{nickname.lower()}%')).gino.all()
     names = {name for name, in names}
     if username.lower() in names:
-        request['session']['errors']['name'] = True
+        request.ctx.session['errors']['name'] = True
         max_digits = min(5, 12 - len(nickname))
         usernames_gen = (f'{nickname}{i}' for i in range(1, int('9' * max_digits)) if f'{nickname.lower()}{i}' not in names)
         usernames = [next(usernames_gen) for _ in range(3)]
@@ -277,7 +277,7 @@ async def _validate_username(request, lang):
                     _make_error_message('name', i18n.t('create.name_taken', locale=lang)), 
                     _remove_class('name', 'valid'),
                     _add_class('name', 'error'),
-                    _update_errors(request['session']['errors'])
+                    _update_errors(request.ctx.session['errors'])
                 ],
                 headers={
                     'X-Drupal-Ajax-Token': 1
@@ -288,19 +288,19 @@ async def _validate_username(request, lang):
                     _make_name_suggestion(usernames, i18n.t('create.vanilla_name_suggest', locale=lang)),
                     _remove_class('name', 'valid'),
                     _add_class('name', 'error'),
-                    _update_errors(request['session']['errors'])
+                    _update_errors(request.ctx.session['errors'])
                 ],
                 headers={
                     'X-Drupal-Ajax-Token': 1
                 }
             )
-    request['session']['errors']['name'] = False
-    request['session']['username'] = username
+    request.ctx.session['errors']['name'] = False
+    request.ctx.session['username'] = username
     return response.json(
         [ 
             _remove_class('name', 'error'),
             _add_class('name', 'valid'),
-            _update_errors(request['session']['errors'])
+            _update_errors(request.ctx.session['errors'])
         ],
         headers={
             'X-Drupal-Ajax-Token': 1
@@ -311,38 +311,38 @@ async def _validate_username(request, lang):
 def _validate_password(request, lang):
     password = request.form.get('pass', None)
     if not password:
-        request['session']['errors']['pass'] = True
+        request.ctx.session['errors']['pass'] = True
         return response.json( 
             [
                 _make_error_message('pass', i18n.t('create.password_short', locale=lang)), 
                 _remove_class('pass', 'valid'),
                 _add_class('pass', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
     elif len(password) < 4:
-        request['session']['errors']['pass'] = True
+        request.ctx.session['errors']['pass'] = True
         return response.json(
             [
                 _make_error_message('pass', i18n.t('create.password_short', locale=lang)), 
                 _remove_class('pass', 'valid'),
                 _add_class('pass', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    request['session']['errors']['pass'] = False
-    request['session']['password'] = password
+    request.ctx.session['errors']['pass'] = False
+    request.ctx.session['password'] = password
     return response.json(
         [
             _remove_class('pass', 'error'),
             _add_class('pass', 'valid'),
-            _update_errors(request['session']['errors'])
+            _update_errors(request.ctx.session['errors'])
         ],
         headers={
             'X-Drupal-Ajax-Token': 1
@@ -355,26 +355,26 @@ async def _validate_email(request, lang):
     _, email = parseaddr(email)
     domain = email.rsplit('@', 1)[-1]
     if not email or '@' not in email:
-        request['session']['errors']['email'] = True
+        request.ctx.session['errors']['email'] = True
         return response.json(
             [
                 _make_error_message('email', i18n.t('create.email_invalid', locale=lang)), 
                 _remove_class('email', 'valid'),
                 _add_class('email', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
     elif app.config.EMAIL_WHITELIST and domain not in app.config.EMAIL_WHITELIST:
-        request['session']['errors']['email'] = True
+        request.ctx.session['errors']['email'] = True
         return response.json(
             [
                 _make_error_message('email', i18n.t('create.email_invalid', locale=lang)), 
                 _remove_class('email', 'valid'),
                 _add_class('email', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
@@ -385,25 +385,25 @@ async def _validate_email(request, lang):
         db.func.lower(Penguin.email) == email.lower()).gino.scalar()
 
     if email_count >= app.config.MAX_ACCOUNT_EMAIL:
-        request['session']['errors']['email'] = True
+        request.ctx.session['errors']['email'] = True
         return response.json( 
             [
                 _make_error_message('email', i18n.t('create.email_invalid', locale=lang)), 
                 _remove_class('email', 'valid'),
                 _add_class('email', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    request['session']['errors']['email'] = False
-    request['session']['email'] = email
+    request.ctx.session['errors']['email'] = False
+    request.ctx.session['email'] = email
     return response.json(
         [
             _remove_class('email', 'error'),
             _add_class('email', 'valid'),
-            _update_errors(request['session']['errors'])
+            _update_errors(request.ctx.session['errors'])
         ],
         headers={
             'X-Drupal-Ajax-Token': 1
@@ -414,23 +414,23 @@ async def _validate_email(request, lang):
 def _validate_terms(request, lang):
     terms = request.form.get('terms', None)
     if not terms:
-        request['session']['errors']['terms'] = True
+        request.ctx.session['errors']['terms'] = True
         return response.json(
             [
                 _make_error_message('terms', i18n.t('create.terms', locale=lang)),
                 _remove_class('terms', 'valid'),
                 _add_class('terms', 'error'),
-                _update_errors(request['session']['errors'])
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    request['session']['errors']['terms'] = False
+    request.ctx.session['errors']['terms'] = False
     return response.json(
         [
             _add_class('terms', 'checked'),
-            _update_errors(request['session']['errors'])
+            _update_errors(request.ctx.session['errors'])
         ],
         headers={
             'X-Drupal-Ajax-Token': 1
@@ -440,20 +440,20 @@ def _validate_terms(request, lang):
 
 def _validate_captcha(request, lang):
     captcha_answer = request.form.get('captcha', None)
-    if 'captcha_answer' not in request['session']:
+    if 'captcha_answer' not in request.ctx.session:
         return response.json(
             {
                 'message': '403 Forbidden'
             },
             status=403
         )
-    elif int(captcha_answer) == int(request['session']['captcha_answer']):
-        request['session']['errors']['captcha'] = False
-        request['session']['captcha']['passed'] = 1
+    elif int(captcha_answer) == int(request.ctx.session['captcha_answer']):
+        request.ctx.session['errors']['captcha'] = False
+        request.ctx.session['captcha']['passed'] = 1
         return response.json(
             [
-                _update_captcha(request['session']['captcha']['passed']),
-                _update_errors(request['session']['errors'])
+                _update_captcha(request.ctx.session['captcha']['passed']),
+                _update_errors(request.ctx.session['errors'])
             ],
             headers={
                 'X-Drupal-Ajax-Token': 1
