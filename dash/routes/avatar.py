@@ -9,19 +9,21 @@ from sanic.log import logger
 from dash import app
 from dash.data.penguin import Penguin
 
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]
-urllib.request.install_opener(opener)
 avatar = Blueprint('avatar', url_prefix='/avatar')
 
 valid_sizes = [
     60,
     88,
-    95,
+avatar_item_directory = os.path.abspath("./items")
     120,
     300,
-    600
-]
+@avatar.listener('before_server_start')
+async def check_avatar_item_directory(app, loop):
+    if not os.path.exists(avatar_item_directory):
+        logger.warn((f'Avatar directory \'{avatar_item_directory}\' is missing! '
+                     'Either download from https://icer.ink/media1.clubpenguin.com/avatar/paper/ '
+                     'or let wand mount the directory for you!'))
+
 
 @avatar.get('/<penguin_id:int>')
 async def get_avatar(request, penguin_id: int):
@@ -53,12 +55,7 @@ def build_avatar(clothing, size):
     avatar_image = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     for item in filter(None, clothing):
         try:
-            if not os.path.isdir(f"./items/{size}"):
-                os.makedirs(f"./items/{size}")
-            if not os.path.isfile(f"./items/{size}/{item}.png"): # temporary solution until wand mounts the avatar folder into dash
-                urllib.request.urlretrieve(f"https://skihill.net/mobcdn.clubpenguin.com/game/items/images/paper/image/{size}/{item}.png", f"./items/{size}/{item}.png")
-            
-            item_image = Image.open(f'./items/{size}/{item}.png', 'r')
+            item_image = Image.open(f'{avatar_item_directory}/{size}/{item}.png', 'r')
             avatar_image.paste(item_image, (0, 0), item_image)
         except FileNotFoundError as e:
             logger.error(e)
