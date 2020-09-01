@@ -33,7 +33,7 @@ all_captchas = [
 ]
 
 
-@vanilla_create.get('/<lang>')
+@vanilla_create.get('/<lang:(en|fr|pt|es)>')
 async def create_page(request, lang):
     base64_captchas = []
     captchas = random.sample(all_captchas, min(len(all_captchas), 3))
@@ -65,46 +65,10 @@ async def create_page(request, lang):
         captcha_base64 = base64.b64encode(buffered.getvalue())
         base64_captchas.append(captcha_base64.decode('utf-8'))
 
-    if lang == 'fr':
-        register_template = env.get_template('create/fr.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            anon_token=request['session']['anon_token'],
-            captcha_1=base64_captchas[0],
-            captcha_2=base64_captchas[1],
-            captcha_3=base64_captchas[2],
-            captcha_answer=i18n.t(f'create.{captcha_answer}', locale=lang),
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    elif lang == 'es':
-        register_template = env.get_template('create/es.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            anon_token=request['session']['anon_token'],
-            captcha_1=base64_captchas[0],
-            captcha_2=base64_captchas[1],
-            captcha_3=base64_captchas[2],
-            captcha_answer=i18n.t(f'create.{captcha_answer}', locale=lang),
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    elif lang == 'pt':
-        register_template = env.get_template('create/pt.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            anon_token=request['session']['anon_token'],
-            captcha_1=base64_captchas[0],
-            captcha_2=base64_captchas[1],
-            captcha_3=base64_captchas[2],
-            captcha_answer=i18n.t(f'create.{captcha_answer}', locale=lang),
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    register_template = env.get_template('create/en.html')
+    register_template = env.get_template(f'create/{lang}.html')
     page = register_template.render(
         VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-        anon_token=request['session']['anon_token'],
+        anon_token=request.ctx.session['anon_token'],
         captcha_1=base64_captchas[0],
         captcha_2=base64_captchas[1],
         captcha_3=base64_captchas[2],
@@ -114,7 +78,7 @@ async def create_page(request, lang):
     return response.html(page)
 
 
-@vanilla_create.post('/<lang>')
+@vanilla_create.post('/<lang:(en|fr|pt|es)>')
 async def register(request, lang):
     trigger = request.form.get('_triggering_element_name', None)
     anon_token = request.form.get('anon_token', None)
@@ -212,14 +176,7 @@ async def _validate_registration(request, lang):
 
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
-        if lang == 'es':
-            mail_template = env.get_template('emails/activation/vanilla/es.html')
-        elif lang == 'pt':
-            mail_template = env.get_template('emails/activation/vanilla/pt.html')
-        elif lang == 'fr':
-            mail_template = env.get_template('emails/activation/vanilla/fr.html')
-        else:
-            mail_template = env.get_template('emails/activation/vanilla/en.html')
+        mail_template = env.get_template(f'emails/activation/vanilla/{lang}.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
             subject=i18n.t('activate.mail_subject', locale=lang),

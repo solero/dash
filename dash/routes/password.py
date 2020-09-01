@@ -13,82 +13,31 @@ from dash.data.penguin import Penguin
 password = Blueprint('password', url_prefix='/password')
 
 
-@password.get('/<lang>')
+@password.get('/<lang:(en|fr|pt|es)>')
 async def password_reset_page(_, lang):
-    if lang == 'fr':
-        template = env.get_template('password/request/fr.html')
-        page = template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    
-    elif lang == 'es':
-        template = env.get_template('password/request/es.html')
-        page = template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    
-    elif lang == 'pt':
-        template = env.get_template('password/request/pt.html')
-        page = template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    
-    else:
-        template = env.get_template('password/request/en.html')
-        page = template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
+    template = env.get_template(f'password/request/{lang}.html')
+    page = template.render(
+        VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+        site_key=app.config.GSITE_KEY
+    )
+    return response.html(page)
 
 
-@password.get('/<lang>/<reset_token>')
+@password.get('/<lang:(en|fr|pt|es)>/<reset_token>')
 async def choose_password_page(_, lang, reset_token):
     reset_key = await app.redis.get(f'{reset_token}.reset_key')
     if reset_key:
-        if lang == 'fr':
-            template = env.get_template('password/choose/fr.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        elif lang == 'es':
-            template = env.get_template('password/choose/es.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        elif lang == 'pt':
-            template = env.get_template('password/choose/pt.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
-        
-        else:
-            template = env.get_template('password/choose/en.html')
-            page = template.render(
-                VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-                token=reset_token,
-                site_key=app.config.GSITE_KEY
-            )
-            return response.html(page)
+        template = env.get_template(f'password/choose/{lang}.html')
+        page = template.render(
+            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
+            token=reset_token,
+            site_key=app.config.GSITE_KEY
+        )
+        return response.html(page)
     return response.json({'message': 'Reset key not found'}, status=404)
 
 
-@password.post('/<lang>')
+@password.post('/<lang:(en|fr|pt|es)>')
 async def request_password_reset(request, lang):
     username = request.form.get('name', '').lower()
     email = request.form.get('email', '').lower()
@@ -128,14 +77,7 @@ async def request_password_reset(request, lang):
     ).gino.first()
     if data and data.email == email:
         reset_key = secrets.token_urlsafe(45)
-        if lang == 'es':
-            mail_template = env.get_template('emails/password/es.html')
-        elif lang == 'pt':
-            mail_template = env.get_template('emails/password/pt.html')
-        elif lang == 'fr':
-            mail_template = env.get_template('emails/password/fr.html')
-        else:
-            mail_template = env.get_template('emails/password/en.html')
+        mail_template = env.get_template(f'emails/password/{lang}.html')
         message = Mail(
             from_email=app.config.FROM_EMAIL, to_emails=email,
             subject=i18n.t('password.reset_password_subject', locale=lang),
@@ -169,7 +111,7 @@ async def request_password_reset(request, lang):
     )
 
 
-@password.post('/<lang>/<reset_token>')
+@password.post('/<lang:(en|fr|pt|es)>/<reset_token>')
 async def choose_password(request, lang, reset_token):
     new_password = request.form.get('password', None)
     confirm_password = request.form.get('confirm_password', None)

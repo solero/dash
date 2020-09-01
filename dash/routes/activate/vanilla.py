@@ -8,33 +8,9 @@ from dash.data.penguin import ActivationKey, Penguin
 vanilla_activate = Blueprint('vanilla_activate', url_prefix='/activate/vanilla')
 
 
-@vanilla_activate.get('/<lang>/<code>')
+@vanilla_activate.get('/<lang:(en|fr|pt|es)>/<code>')
 async def activate_page_autofill(_, lang, code):
-    if lang == 'fr':
-        register_template = env.get_template('activate/fr.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY,
-            activation_key=code
-        )
-        return response.html(page)
-    elif lang == 'es':
-        register_template = env.get_template('activate/es.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY,
-            activation_key=code
-        )
-        return response.html(page)
-    elif lang == 'pt':
-        register_template = env.get_template('activate/pt.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY,
-            activation_key=code
-        )
-        return response.html(page)
-    register_template = env.get_template('activate/en.html')
+    register_template = env.get_template(f'activate/{lang}.html')
     page = register_template.render(
         VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         site_key=app.config.GSITE_KEY,
@@ -43,30 +19,9 @@ async def activate_page_autofill(_, lang, code):
     return response.html(page)
 
 
-@vanilla_activate.get('/<lang>')
+@vanilla_activate.get('/<lang:(en|fr|pt|es)>')
 async def activate_page(_, lang):
-    if lang == 'fr':
-        register_template = env.get_template('activate/fr.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    elif lang == 'es':
-        register_template = env.get_template('activate/es.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    elif lang == 'pt':
-        register_template = env.get_template('activate/pt.html')
-        page = register_template.render(
-            VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
-            site_key=app.config.GSITE_KEY
-        )
-        return response.html(page)
-    register_template = env.get_template('activate/en.html')
+    register_template = env.get_template(f'activate/{lang}.html')
     page = register_template.render(
         VANILLA_PLAY_LINK=app.config.VANILLA_PLAY_LINK,
         site_key=app.config.GSITE_KEY
@@ -74,7 +29,7 @@ async def activate_page(_, lang):
     return response.html(page)
 
 
-@vanilla_activate.post('/<lang>')
+@vanilla_activate.post('/<lang:(en|fr|pt|es)>')
 async def activate_page(request, lang):
     username = request.form.get('name', '')
     activation_code = request.form.get('activationcode', '')
