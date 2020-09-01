@@ -11,12 +11,12 @@ from dash.data.penguin import Penguin
 
 avatar = Blueprint('avatar', url_prefix='/avatar')
 
-valid_sizes = [
-    60,
-    88,
+valid_sizes = [60, 88, 95, 120, 300, 600]
+cache_expiry = 60 * 10
+
 avatar_item_directory = os.path.abspath("./items")
-    120,
-    300,
+
+
 @avatar.listener('before_server_start')
 async def check_avatar_item_directory(app, loop):
     if not os.path.exists(avatar_item_directory):
@@ -32,22 +32,31 @@ async def get_avatar(request, penguin_id: int):
     if int(size) not in valid_sizes:
         return response.json({"message": 'Invalid size'}, status=400)
 
-    clothing = await Penguin.select(
-        'photo', 'flag', 'color', 'head', 'face', 'body',  'neck', 'hand', 'feet'
-    ).where(Penguin.id == penguin_id).gino.first()
+    image = await app.redis.get(f'{penguin_id}.{size}.avatar')
 
-    if clothing is None:
-        return response.json({'message': 'Not found'}, status=404)
+    if not image:
+        clothing = await Penguin.select(
+            'photo', 'color', 'head', 'face', 'body', 'neck', 'hand', 'feet'
+        ).where(Penguin.id == penguin_id).gino.first()
 
-    if background != 'true':
-        clothing.pop(0)
+        if clothing is None:
+            return response.json({'message': 'Not found'}, status=404)
 
-    loop = asyncio.get_event_loop()
-    try:
-        future = loop.run_in_executor(None, build_avatar, clothing, int(size))
-        image = await asyncio.wait_for(future, timeout=5.0, loop=loop)
-    except asyncio.TimeoutError:
-        return response.json({"message": "Something has gone wrong."}, status=500)
+        clothing = list(clothing)
+
+        if background != 'true':
+            clothing.pop(0)
+
+        loop = asyncio.get_event_loop()
+        try:
+            future = loop.run_in_executor(None, build_avatar, clothing, int(size))
+            image = await asyncio.wait_for(future, timeout=5.0, loop=loop)
+
+            await app.redis.setex(f'{penguin_id}.{size}.avatar', cache_expiry, image)
+        except asyncio.TimeoutError:
+            return response.json({"message": "Something has gone wrong."}, status=500)
+    else:
+        await app.redis.expire(f'{penguin_id}.{size}.avatar', cache_expiry)
     return response.raw(image, headers={'Content-type': 'image/png'})
 
 
