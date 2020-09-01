@@ -22,21 +22,19 @@ legacy_create = Blueprint('legacy_create', url_prefix='/create/legacy')
 
 @legacy_create.post('/')
 async def register(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    action = post_data.get('action')[0]
+    action = request.form.get('action', None)
     if action == 'validate_agreement':
-        return await validate_agreement(request, post_data)
+        return await validate_agreement(request)
     elif action == 'validate_username':
-        return await validate_username(request, post_data)
+        return await validate_username(request)
     elif action == 'validate_password_email':
-        return await validate_password_email(request, post_data)
+        return await validate_password_email(request)
         
 
-async def validate_agreement(_, post_data):
-    agree_terms = post_data.get('agree_to_terms')[0]
-    agree_rules = post_data.get('agree_to_rules')[0]
-    lang = post_data.get('lang', 'en')[0]
+async def validate_agreement(request):
+    agree_terms = request.form.get('agree_to_terms', 0)
+    agree_rules = request.form.get('agree_to_rules', 0)
+    lang = request.form.get('lang', 'en')
     if not int(agree_terms) or not int(agree_rules):
         return response.text(urlencode({
             'error': i18n.t('create.terms', locale=lang)
@@ -44,10 +42,10 @@ async def validate_agreement(_, post_data):
     return response.text(urlencode({'success': 1}))
 
 
-async def validate_username(request, post_data):
-    username = post_data.get('username', [None])[0].strip()
-    color = post_data.get('colour')[0]
-    lang = post_data.get('lang')[0]
+async def validate_username(request):
+    username = request.form.get('username', None)
+    color = request.form.get('colour', '0')
+    lang = request.form.get('lang', 'en')
 
     if not username:
         return response.text(urlencode({
@@ -97,15 +95,14 @@ async def validate_username(request, post_data):
     return response.text(urlencode({'success': 1, 'sid': request['session']['sid']}))
 
 
-async def validate_password_email(request, post_data):
-    session_id = post_data.get('sid')[0]
-    session = request['session']
-    username = session.get('username', None).strip()
-    color = session.get('color', None)
-    password = post_data.get('password')[0]
-    password_confirm = post_data.get('password_confirm')[0]
-    email = post_data.get('email')[0]
-    lang = post_data.get('lang')[0]
+async def validate_password_email(request):
+    session_id = request.form.get('sid')
+    username = request.ctx.session.get('username', None)
+    color = request.ctx.session.get('color', '0')
+    password = request.form.get('password')
+    password_confirm = request.form.get('password_confirm')
+    email = request.form.get('email')
+    lang = request.form.get('lang')
 
     if session_id != session['sid']:
         return response.text(urlencode({
@@ -113,7 +110,7 @@ async def validate_password_email(request, post_data):
         }))
 
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('gtoken', [None])[0]
+        gclient_response = request.form.get('gtoken', '')
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,

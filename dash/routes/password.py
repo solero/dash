@@ -90,12 +90,10 @@ async def choose_password_page(_, lang, reset_token):
 
 @password.post('/<lang>')
 async def request_password_reset(request, lang):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    username = post_data.get('name', [None])[0].lower()
-    email = post_data.get('email', [None])[0].lower()
+    username = request.form.get('name', '').lower()
+    email = request.form.get('email', '').lower()
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', '')
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
@@ -173,10 +171,8 @@ async def request_password_reset(request, lang):
 
 @password.post('/<lang>/<reset_token>')
 async def choose_password(request, lang, reset_token):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    password = post_data.get('password', [None])[0]
-    confirm_password = post_data.get('confirm_password', [None])[0]
+    new_password = request.form.get('password', None)
+    confirm_password = request.form.get('confirm_password', None)
     player_id = await app.redis.get(f'{reset_token}.reset_key')
     try:
         player_id = player_id.decode()
@@ -186,7 +182,7 @@ async def choose_password(request, lang, reset_token):
         Penguin.id == int(player_id)
     ).gino.first()
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', '')
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
@@ -196,7 +192,7 @@ async def choose_password(request, lang, reset_token):
                 gresult = await resp.json()
                 if not gresult['success']:
                     return response.text('Your captcha score was low, please try again.')
-    if not password:
+    if not new_password:
         return response.json(
             [
                 _add_class('password', 'error')
@@ -214,7 +210,7 @@ async def choose_password(request, lang, reset_token):
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    elif len(password) < 4:
+    elif len(new_password) < 4:
         return response.json(
             [
                 _add_class('password', 'error')
@@ -223,7 +219,7 @@ async def choose_password(request, lang, reset_token):
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    elif password != confirm_password:
+    elif new_password != confirm_password:
         return response.json(
             [
                 _add_class('password', 'error'),
@@ -233,11 +229,11 @@ async def choose_password(request, lang, reset_token):
                 'X-Drupal-Ajax-Token': 1
             }
         )
-    password = Crypto.hash(password).upper()
-    password = Crypto.get_login_hash(password, rndk=app.config.STATIC_KEY)
-    password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
+    new_password = Crypto.hash(new_password).upper()
+    new_password = Crypto.get_login_hash(new_password, rndk=app.config.STATIC_KEY)
+    new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
     await app.redis.delete(f'{reset_token}.reset_key')
-    await Penguin.update.values(password=password).where(Penguin.id == data.id).gino.status()
+    await Penguin.update.values(password=new_password).where(Penguin.id == data.id).gino.status()
     return response.json(
         [
             _remove_selector('#edit-password'),

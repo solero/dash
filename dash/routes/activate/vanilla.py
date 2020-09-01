@@ -76,16 +76,14 @@ async def activate_page(_, lang):
 
 @vanilla_activate.post('/<lang>')
 async def activate_page(request, lang):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    username = post_data.get('name', [None])[0]
-    activation_code = post_data.get('activationcode', [None])[0]
+    username = request.form.get('name', '')
+    activation_code = request.form.get('activationcode', '')
     data = await Penguin.query.where(Penguin.username == username.lower()).gino.first()
     activation_data = await ActivationKey.query.where(
         ActivationKey.activation_key == activation_code
     ).gino.first()
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', '')
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,

@@ -116,10 +116,9 @@ async def create_page(request, lang):
 
 @vanilla_create.post('/<lang>')
 async def register(request, lang):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    trigger = post_data.get('_triggering_element_name', [None])[0]
-    anon_token = post_data.get('anon_token', [None])[0]
+    trigger = request.form.get('_triggering_element_name', None)
+    anon_token = request.form.get('anon_token', None)
+    if 'anon_token' not in request.ctx.session:
     if 'anon_token' not in request['session']:
         return response.json(
             {
@@ -135,23 +134,23 @@ async def register(request, lang):
             status=403
         )
     elif trigger == 'name':
-        return await _validate_username(request, post_data, lang)
+        return await _validate_username(request, lang)
     elif trigger == 'pass':
-        return _validate_password(request, post_data, lang)
+        return _validate_password(request, lang)
     elif trigger == 'email':
-        return await _validate_email(request, post_data, lang)
+        return await _validate_email(request, lang)
     elif trigger == 'terms':
-        return _validate_terms(request, post_data, lang)
+        return _validate_terms(request, lang)
     elif trigger == 'captcha':
-        return _validate_captcha(request, post_data, lang)
-    return await _validate_registration(request, post_data, lang)
+        return _validate_captcha(request, lang)
+    return await _validate_registration(request, lang)
     
 
-async def _validate_registration(request, post_data, lang):
-    username = post_data.get('name', [None])[0].strip()
-    password = post_data.get('pass', [None])[0] 
-    email = post_data.get('email', [None])[0]
-    color = post_data.get('color', [None])[0]  
+async def _validate_registration(request, lang):
+    username = request.form.get('name', None)
+    password = request.form.get('pass', None)
+    email = request.form.get('email', None)
+    color = request.form.get('color', None)
     if 'username' not in request['session'] or request['session']['username'] != username:
         return response.json(
             {
@@ -181,7 +180,7 @@ async def _validate_registration(request, post_data, lang):
             status=403
         )
     elif app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', None)
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
@@ -349,8 +348,8 @@ async def _validate_username(request, post_data, lang):
     )
 
 
-def _validate_password(request, post_data, lang):
-    password = post_data.get('pass', [None])[0]
+def _validate_password(request, lang):
+    password = request.form.get('pass', None)
     if not password:
         request['session']['errors']['pass'] = True
         return response.json( 
@@ -391,8 +390,8 @@ def _validate_password(request, post_data, lang):
     )
 
 
-async def _validate_email(request, post_data, lang):
-    email = post_data.get('email', [None])[0]
+async def _validate_email(request, lang):
+    email = request.form.get('email', None)
     _, email = parseaddr(email)
     domain = email.rsplit('@', 1)[-1]
     if not email or '@' not in email:
@@ -452,8 +451,8 @@ async def _validate_email(request, post_data, lang):
     )
 
 
-def _validate_terms(request, post_data, lang):
-    terms = post_data.get('terms', [None])[0]
+def _validate_terms(request, lang):
+    terms = request.form.get('terms', None)
     if not terms:
         request['session']['errors']['terms'] = True
         return response.json(
@@ -479,8 +478,8 @@ def _validate_terms(request, post_data, lang):
     )
 
 
-def _validate_captcha(request, post_data, lang):
-    captcha_answer = post_data.get('captcha', [None])[0]
+def _validate_captcha(request, lang):
+    captcha_answer = request.form.get('captcha', None)
     if 'captcha_answer' not in request['session']:
         return response.json(
             {
