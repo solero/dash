@@ -1,15 +1,14 @@
-from urllib.parse import parse_qs
-from sanic import response
-from sanic import Blueprint
-from sendgrid import SendGridAPIClient, Mail
-from dash import env, app
+import secrets
+
+import aiohttp
+import bcrypt
+import i18n
+from sanic import Blueprint, response
+from sendgrid import Mail, SendGridAPIClient
+
+from dash import app, env
 from dash.crypto import Crypto
 from dash.data.penguin import Penguin
-
-import i18n
-import secrets
-import bcrypt
-import aiohttp
 
 password = Blueprint('password', url_prefix='/password')
 

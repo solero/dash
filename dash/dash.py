@@ -1,20 +1,20 @@
-from dash.data.penguin import db
+import os
+
+import aioredis
+import i18n
 
 from dash import app, settings
-from dash.routes.avatar import avatar
-from dash.routes.autocomplete import autocomplete
-from dash.routes.create.legacy import legacy_create
-from dash.routes.create.vanilla import vanilla_create
+from dash.data.penguin import db
 from dash.routes.activate.legacy import legacy_activate
 from dash.routes.activate.vanilla import vanilla_activate
+from dash.routes.autocomplete import autocomplete
+from dash.routes.avatar import avatar
+from dash.routes.create.legacy import legacy_create
+from dash.routes.create.vanilla import vanilla_create
+from dash.routes.manager import manager
 from dash.routes.password import password
 from dash.routes.snow.session import session
 from dash.routes.snow.swrequest import swrequest
-from dash.routes.manager import manager
-
-import i18n
-import os
-import aioredis
 
 
 @app.listener('before_server_start')
@@ -30,6 +30,7 @@ async def start_services(sanic, loop):
         minsize=5, 
         maxsize=10
     )
+
 
 def main(args):
     i18n.load_path.append(os.path.abspath('locale'))   

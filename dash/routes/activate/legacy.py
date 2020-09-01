@@ -1,7 +1,7 @@
-from dash.data.penguin import Penguin, ActivationKey
-from sanic import Blueprint
-from sanic import response
+from sanic import Blueprint, response
+
 from dash import app
+from dash.data.penguin import ActivationKey, Penguin
 
 legacy_activate = Blueprint('legacy_activate', url_prefix='/activate/legacy')
 

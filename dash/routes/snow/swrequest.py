@@ -1,10 +1,7 @@
-from urllib.parse import parse_qs, urlencode
-
-from sanic import response
-from sanic import Blueprint
+from sanic import Blueprint, response
 from sanic.log import logger
 
-from dash import settings 
+from dash import settings
 
 swrequest = Blueprint('swrequest', url_prefix='/swrequest')
 

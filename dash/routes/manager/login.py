@@ -1,16 +1,17 @@
-from sanic import Blueprint, response
+import asyncio
 from datetime import datetime
+from functools import wraps
+from urllib.parse import parse_qs
+
+import aiohttp
+import bcrypt
+from sanic import Blueprint, response
+from sqlalchemy import func
+
+from dash import app, env
 from dash.crypto import Crypto
 from dash.data.moderator import Ban
 from dash.data.penguin import Penguin
-from urllib.parse import parse_qs
-from dash import env, app
-from sqlalchemy import func
-from functools import wraps
-
-import asyncio
-import bcrypt
-import aiohttp
 
 login = Blueprint('login', url_prefix='/login')
 logout = Blueprint('logout', url_prefix='/logout')

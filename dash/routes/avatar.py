@@ -1,14 +1,13 @@
-from PIL import Image
-from dash.data.penguin import Penguin
+import asyncio
+import io
+import os
 
-from sanic import response
-from sanic import Blueprint
+from PIL import Image
+from sanic import Blueprint, response
 from sanic.log import logger
 
-import io
-import asyncio
-import urllib
-import os
+from dash import app
+from dash.data.penguin import Penguin
 
 opener = urllib.request.build_opener()
 opener.addheaders = [('User-agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36')]

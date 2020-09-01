@@ -1,22 +1,21 @@
-from dash.routes.manager.login import login, logout, login_auth
-from dash.routes.manager.verification import verification
-from dash.routes.manager.moderation import moderation
-from dash import env, app
-from sqlalchemy import func
+import asyncio
+import os
 from email.utils import parseaddr
 from urllib.parse import parse_qs
-from sanic import Blueprint, response
-from dash.data import db
-from dash.data.penguin import Penguin
-from dash.data.penguin import Login
-from dash.crypto import Crypto
-from dash.routes.manager.login import login_auth
 
-import bcrypt
-import asyncio
 import aiohttp
+import bcrypt
+from sanic import Blueprint, response
+from sqlalchemy import func
 
-import os
+from dash import app, env
+from dash.crypto import Crypto
+from dash.data import db
+from dash.data.penguin import Login, Penguin
+from dash.routes.manager.login import login, login_auth, login_auth, logout
+from dash.routes.manager.moderation import moderation
+from dash.routes.manager.verification import verification
+
 panel = Blueprint('main', url_prefix='/')
 static = Blueprint('static', url_prefix='/static')
 static.static('/', os.path.join(os.path.dirname(os.path.abspath(__file__)), './static'))

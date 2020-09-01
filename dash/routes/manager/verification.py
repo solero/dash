@@ -1,9 +1,12 @@
-from sanic import Blueprint, response
-from dash import env
 from urllib.parse import parse_qs
+
+from sanic import Blueprint, response
 from sqlalchemy import func
+
+from dash import env
 from dash.data.penguin import Penguin
 from dash.routes.manager.login import login_auth
+
 verification = Blueprint('verification', url_prefix='/verify')
 
 

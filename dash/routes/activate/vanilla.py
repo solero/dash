@@ -1,11 +1,9 @@
-from urllib.parse import parse_qs
-from sanic import Blueprint
-from sanic import response
-from dash.data.penguin import Penguin, ActivationKey
-from dash import env, app
-
 import aiohttp
 import i18n
+from sanic import Blueprint, response
+
+from dash import app, env
+from dash.data.penguin import ActivationKey, Penguin
 
 vanilla_activate = Blueprint('vanilla_activate', url_prefix='/activate/vanilla')
 

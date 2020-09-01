@@ -1,9 +1,7 @@
-from sanic import Blueprint
-from sanic import response
-
-from fast_autocomplete import AutoComplete
 import json
 
+from fast_autocomplete import AutoComplete
+from sanic import Blueprint, response
 
 autocomplete = Blueprint('autocomplete', url_prefix='/autocomplete')
 
