@@ -20,7 +20,7 @@ async def verify_page(_):
 @login_auth()
 async def verify_page(request, lang):
     template = env.get_template('manager/verify.html')
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     if lang == 'de':
         unverified_penguins = await Penguin.query.where(
             (Penguin.approval_de == False) & (Penguin.rejection_de == False)
@@ -65,7 +65,7 @@ async def search_username(request):
     post_data = parse_qs(query_string)
     username = post_data.get('username', [None])[0]
     language = post_data.get('language', [None])[0]
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     if not language:
         return response.text('You must provide a valid language.')
     elif not username:
@@ -124,7 +124,7 @@ async def approve_request(request, penguin_id):
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
     language = post_data.get('language', [None])[0]
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:
         return response.text('You must provide a valid language.')
@@ -183,7 +183,7 @@ async def reject_request(request, penguin_id):
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
     language = post_data.get('language', [None])[0]
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:
         return response.text('You must provide a valid language.')

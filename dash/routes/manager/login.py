@@ -148,8 +148,8 @@ async def login_request(request):
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
-    request['session']['username'] = username
-    request['session']['logged_in'] = True 
+    request.ctx.session['username'] = username
+    request.ctx.session['logged_in'] = True
     return response.redirect('/manager')
 
 
@@ -157,13 +157,13 @@ def login_auth():
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
-            if 'username' not in request['session']:
+            if 'username' not in request.ctx.session:
                 return response.redirect('/manager/login')
-            elif request['session']['username'] is None:
+            elif request.ctx.session.get('username') is None:
                 return response.redirect('/manager/login')
-            elif 'logged_in' not in request['session']:
+            elif 'logged_in' not in request.ctx.session:
                 return response.redirect('/manager/login')
-            elif request['session']['logged_in'] is not True:
+            elif request.ctx.session.get('logged_in') is not True:
                 return response.redirect('/manager/login')
             return await f(request, *args, **kwargs)
         return decorated_function
@@ -173,6 +173,6 @@ def login_auth():
 @logout.get('/')
 @login_auth()
 async def logout_request(request):
-    request['session']['username'] = None
-    request['session']['logged_in'] = False
+    request.ctx.session['username'] = None
+    request.ctx.session['logged_in'] = False
     return response.redirect('/manager/login')

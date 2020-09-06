@@ -25,7 +25,7 @@ async def ban_player(request):
     hours = post_data.get('hours', [None])[0]
     comment = post_data.get('comment', [None])[0]
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
-    moderator = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    moderator = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     if not player:
         return response.text('The player ID given does not exist.')
     number_bans = await db.select([db.func.count(Ban.penguin_id)]).where(
@@ -36,7 +36,7 @@ async def ban_player(request):
         await Penguin.update.values(permaban=True).where(Penguin.id == player.id).gino.status()
     await Ban.create(penguin_id=player.id, issued=date_issued, expires=date_expires,
                      moderator_id=moderator.id, reason=2, comment=comment, message='')
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     latest_ban = await get_latest_ban(player_id)
     bans = await get_bans(player_id)
     login_history = await get_login_history(player_id)
@@ -63,7 +63,7 @@ async def unban_player(request):
     player_id = post_data.get('player', [None])[0]
     comment = post_data.get('comment', [None])[0]
     ban = await Ban.query.where((Ban.penguin_id == int(player_id))  & (Ban.comment == comment)).gino.first()
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
     latest_ban = await get_latest_ban(player_id)
     bans = await get_bans(player_id)
@@ -104,7 +104,7 @@ async def update_player(request):
     player_id = post_data.get('player', [None])[0]
     type = post_data.get('type', [None])[0]
     template = env.get_template('manager/edit-player.html')
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
     if player is None:
         return response.redirect('/manager/manage')
@@ -451,7 +451,7 @@ async def update_player(request):
 @moderation.get('/<penguin_id>')
 @login_auth()
 async def edit_player(request, penguin_id):
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     player = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not player:
         template = env.get_template('manager/manage.html')
@@ -486,7 +486,7 @@ async def edit_player(request, penguin_id):
 @login_auth()
 async def manage_page(request):
     template = env.get_template('manager/manage.html')
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     penguins = await Penguin.query.order_by(Penguin.registration_date.desc()).gino.all()
     penguins = get_paginated_result(penguins)
     page = template.render(
@@ -502,7 +502,7 @@ async def manage_page(request):
 @login_auth()
 async def search_player(request):
     template = env.get_template('manager/manage.html')
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     query_string = request.body.decode('UTF-8')
     post_data = parse_qs(query_string)
     search_query = post_data.get('search_query', [None])[0]

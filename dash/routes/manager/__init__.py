@@ -34,7 +34,7 @@ manager = Blueprint.group(
 @panel.get('')
 @login_auth()
 async def main_page(request):
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     login_history = await Login.query.where(Login.penguin_id == data.id).order_by(Login.date.desc()).limit(5).gino.all()
     template = env.get_template('manager/panel.html')
     page = template.render(
@@ -114,7 +114,7 @@ async def password_request(request):
             site_key=app.config.GSITE_KEY
         )
         return response.html(page)
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     loop = asyncio.get_event_loop()
 
     old_password = Crypto.hash(old_password).upper()
@@ -135,7 +135,7 @@ async def password_request(request):
     password = Crypto.get_login_hash(password, rndk=app.config.STATIC_KEY)
     password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
     await Penguin.update.values(password=password).where(Penguin.id == data.id).gino.status()
-    data = await Penguin.query.where(func.lower(Penguin.username) == request['session']['username']).gino.first()
+    data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     login_history = await Login.query.where(Login.penguin_id == data.id).order_by(Login.date.desc()).limit(5).gino.all()
     template = env.get_template('manager/panel.html')
     page = template.render(
