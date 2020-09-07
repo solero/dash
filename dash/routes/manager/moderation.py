@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from email.utils import parseaddr
-from urllib.parse import parse_qs
 
 import bcrypt
 from sanic import Blueprint, response
@@ -19,11 +18,9 @@ moderation = Blueprint('moderation', url_prefix='/manage')
 @moderation.post('/ban')
 @login_auth()
 async def ban_player(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    player_id = post_data.get('player', [None])[0]
-    hours = post_data.get('hours', [None])[0]
-    comment = post_data.get('comment', [None])[0]
+    player_id = request.form.get('player', None)
+    hours = request.form.get('hours', None)
+    comment = request.form.get('comment', None)
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
     moderator = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     if not player:
@@ -58,10 +55,8 @@ async def ban_player(request):
 @moderation.post('/unban')
 @login_auth()
 async def unban_player(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    player_id = post_data.get('player', [None])[0]
-    comment = post_data.get('comment', [None])[0]
+    player_id = request.form.get('player', None)
+    comment = request.form.get('comment', None)
     ban = await Ban.query.where((Ban.penguin_id == int(player_id))  & (Ban.comment == comment)).gino.first()
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
@@ -99,10 +94,8 @@ async def unban_player(request):
 @moderation.post('/edit')
 @login_auth()
 async def update_player(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    player_id = post_data.get('player', [None])[0]
-    type = post_data.get('type', [None])[0]
+    player_id = request.form.get('player', None)
+    type = request.form.get('type', None)
     template = env.get_template('manager/edit-player.html')
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     player = await Penguin.query.where(Penguin.id == int(player_id)).gino.first()
@@ -124,7 +117,7 @@ async def update_player(request):
         )
         return response.html(page)
     if type == 'id':
-        id = post_data.get('id', [None])[0]
+        id = request.form.get('id', None)
         if not id:
             page = template.render(
                 success_message='',
@@ -176,7 +169,7 @@ async def update_player(request):
         )
         return response.html(page)
     elif type == 'username':
-        username = post_data.get('username', [None])[0]
+        username = request.form.get('username', None)
         if not username:
             page = template.render(
                 success_message='',
@@ -228,7 +221,7 @@ async def update_player(request):
         )
         return response.html(page)
     elif type == 'nickname':
-        nickname = post_data.get('nickname', [None])[0]
+        nickname = request.form.get('nickname', None)
         if not nickname:
             page = template.render(
                 success_message='',
@@ -267,7 +260,7 @@ async def update_player(request):
         )
         return response.html(page)
     elif type == 'password':
-        password = post_data.get('password', [None])[0]
+        password = request.form.get('password', None)
         if not password:
             page = template.render(
                 success_message='',
@@ -296,7 +289,7 @@ async def update_player(request):
         )
         return response.html(page)
     elif type == 'email':
-        email = post_data.get('email', [None])[0]
+        email = request.form.get('email', None)
         if not email:
             page = template.render(
                 success_message='',
@@ -351,7 +344,7 @@ async def update_player(request):
         )
         return response.html(page)
     elif type == 'coins':
-        coins = post_data.get('coins', [None])[0]
+        coins = request.form.get('coins', None)
         if not coins:
             page = template.render(
                 success_message='',
@@ -503,10 +496,8 @@ async def manage_page(request):
 async def search_player(request):
     template = env.get_template('manager/manage.html')
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    search_query = post_data.get('search_query', [None])[0]
-    search_type = post_data.get('search_type', [None])[0]
+    search_query = request.form.get('search_query', None)
+    search_type = request.form.get('search_type', None)
     if search_query is None:
         return response.text('You must provide a valid search query.')
     elif search_type is None:

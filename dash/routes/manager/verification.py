@@ -1,5 +1,3 @@
-from urllib.parse import parse_qs
-
 from sanic import Blueprint, response
 from sqlalchemy import func
 
@@ -61,10 +59,8 @@ async def verify_page(request, lang):
 @login_auth()
 async def search_username(request):
     template = env.get_template('manager/verify.html')
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    username = post_data.get('username', [None])[0]
-    language = post_data.get('language', [None])[0]
+    username = request.form.get('username', None)
+    language = request.form.get('language', None)
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     if not language:
         return response.text('You must provide a valid language.')
@@ -121,9 +117,7 @@ async def search_username(request):
 @login_auth()
 async def approve_request(request, penguin_id):
     template = env.get_template('manager/verify.html')
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    language = post_data.get('language', [None])[0]
+    language = request.form.get('language', None)
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:
@@ -180,9 +174,7 @@ async def approve_request(request, penguin_id):
 @login_auth()
 async def reject_request(request, penguin_id):
     template = env.get_template('manager/verify.html')
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    language = post_data.get('language', [None])[0]
+    language = request.form.get('language', None)
     data = await Penguin.query.where(func.lower(Penguin.username) == request.ctx.session.get('username')).gino.first()
     penguin = await Penguin.query.where(Penguin.id == int(penguin_id)).gino.first()
     if not language:

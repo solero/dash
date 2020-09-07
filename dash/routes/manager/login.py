@@ -30,15 +30,13 @@ async def login_page(_):
 
 @login.post('/')
 async def login_request(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    username = post_data.get('username', [None])[0]
+    username = request.form.get('username', None)
     username = username.lower()
-    password = post_data.get('password', [None])[0]
+    password = request.form.get('password', None)
     loop = asyncio.get_event_loop()
     template = env.get_template('manager/login.html')
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', None)
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,

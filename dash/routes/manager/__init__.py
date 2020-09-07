@@ -1,10 +1,9 @@
 import asyncio
 import os
-from email.utils import parseaddr
-from urllib.parse import parse_qs
-
 import aiohttp
 import bcrypt
+
+from email.utils import parseaddr
 from sanic import Blueprint, response
 from sqlalchemy import func
 
@@ -63,14 +62,12 @@ async def password_page(_):
 @panel.post('password')
 @login_auth()
 async def password_request(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    old_password = post_data.get('old_password', [None])[0]
-    password = post_data.get('password', [None])[0]
-    password_confirm = post_data.get('password_confirm', [None])[0]
+    old_password = request.form.get('old_password', None)
+    password = request.form.get('password', None)
+    password_confirm = request.form.get('password_confirm', None)
     template = env.get_template('manager/password.html')
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', None)
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
@@ -164,13 +161,11 @@ async def email_page(_):
 @panel.post('email')
 @login_auth()
 async def email_request(request):
-    query_string = request.body.decode('UTF-8')
-    post_data = parse_qs(query_string)
-    email = post_data.get('email', [None])[0]
-    email_confirm = post_data.get('email_confirm', [None])[0]
+    email = request.form.get('email', None)
+    email_confirm = request.form.get('email_confirm', None)
     template = env.get_template('manager/email.html')
     if app.config.GSECRET_KEY:
-        gclient_response = post_data.get('recaptcha_response', [None])[0]
+        gclient_response = request.form.get('recaptcha_response', None)
         async with aiohttp.ClientSession() as session:
             async with session.post(app.config.GCAPTCHA_URL, data=dict(
                 secret=app.config.GSECRET_KEY,
