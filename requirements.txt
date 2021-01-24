@@ -1,4 +1,5 @@
-fast-autocomplete
+python-Levenshtein
+fast-autocomplete[levenshtein]
 aiohttp
 aioredis
 sanic
