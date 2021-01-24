@@ -7,7 +7,6 @@ from dash import app, settings
 from dash.data.penguin import db
 from dash.routes.activate.legacy import legacy_activate
 from dash.routes.activate.vanilla import vanilla_activate
-from dash.routes.autocomplete import autocomplete
 from dash.routes.avatar import avatar
 from dash.routes.create.legacy import legacy_create
 from dash.routes.create.vanilla import vanilla_create
@@ -40,7 +39,6 @@ def main(args):
         app.config.from_object(settings)
 
     app.blueprint(avatar)
-    app.blueprint(autocomplete)
     app.blueprint(legacy_create)
     app.blueprint(vanilla_create)
     app.blueprint(legacy_activate)
