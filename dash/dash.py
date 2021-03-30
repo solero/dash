@@ -33,11 +33,11 @@ async def start_services(sanic, loop):
 
 
 def main(args):
-    i18n.load_path.append(os.path.abspath('locale'))   
+    i18n.load_path.append(os.path.abspath('locale'))  
     if args.config:
-        app.config.from_pyfile(args.config)
+        app.config.update_config(f"./{args.config}")
     else:
-        app.config.from_object(settings)
+        app.config.update_config(settings)
 
     app.blueprint(avatar)
     app.blueprint(autocomplete)
