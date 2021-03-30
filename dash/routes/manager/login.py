@@ -7,7 +7,7 @@ import aiohttp
 import bcrypt
 from sanic import Blueprint, response
 from sqlalchemy import func
-
+from sanic.response import json
 from dash import app, env
 from dash.crypto import Crypto
 from dash.data.moderator import Ban
@@ -82,8 +82,8 @@ async def login_request(request):
                                                   data.password.encode('utf-8'))
     flood_key = f'{request.ip}.flood'
     if not password_correct:
-        if await app.redis.exists(flood_key):
-            tr = app.redis.multi_exec()
+        if await app.ctx.redis.exists(flood_key):
+            tr = app.ctx.redis.multi_exec()
             tr.incr(flood_key)
             tr.expire(flood_key, app.config.LOGIN_FAILURE_TIMER)
             failure_count, _ = await tr.execute()
@@ -95,7 +95,7 @@ async def login_request(request):
                 )
                 return response.html(page)
         else:
-            await app.redis.setex(flood_key, app.config.LOGIN_FAILURE_TIMER, 1)
+            await app.ctx.redis.setex(flood_key, app.config.LOGIN_FAILURE_TIMER, 1)
         page = template.render(
             success_message='',
             error_message='You have entered an incorrect password.',
@@ -103,7 +103,7 @@ async def login_request(request):
         )
         return response.html(page)
 
-    failure_count = await app.redis.get(flood_key)
+    failure_count = await app.ctx.redis.get(flood_key)
     if failure_count:
         max_attempts_exceeded = int(failure_count) >= app.config.LOGIN_FAILURE_LIMIT
         if max_attempts_exceeded:
@@ -114,7 +114,7 @@ async def login_request(request):
             )
             return response.html(page)
         else:
-            await app.redis.delete(flood_key)
+            await app.ctx.redis.delete(flood_key)
     if not data.active:
         page = template.render(
             success_message='',

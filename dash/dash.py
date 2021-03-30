@@ -25,7 +25,7 @@ async def start_services(sanic, loop):
                       f'{app.config.POSTGRES_HOST}/'
                       f'{app.config.POSTGRES_NAME}')
 
-    app.redis = await aioredis.create_redis_pool(
+    app.ctx.redis = await aioredis.create_redis_pool(
         f'redis://{app.config.REDIS_ADDRESS}:{app.config.REDIS_PORT}',
         minsize=5, 
         maxsize=10

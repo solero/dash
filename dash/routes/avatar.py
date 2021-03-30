@@ -32,7 +32,7 @@ async def get_avatar(request, penguin_id: int):
     if int(size) not in valid_sizes:
         return response.json({"message": 'Invalid size'}, status=400)
 
-    image = await app.redis.get(f'{penguin_id}.{size}.avatar')
+    image = await app.ctx.redis.get(f'{penguin_id}.{size}.avatar')
 
     if not image:
         clothing = await Penguin.select(
@@ -52,11 +52,11 @@ async def get_avatar(request, penguin_id: int):
             future = loop.run_in_executor(None, build_avatar, clothing, int(size))
             image = await asyncio.wait_for(future, timeout=5.0, loop=loop)
 
-            await app.redis.setex(f'{penguin_id}.{size}.avatar', cache_expiry, image)
+            await app.ctx.redis.setex(f'{penguin_id}.{size}.avatar', cache_expiry, image)
         except asyncio.TimeoutError:
             return response.json({"message": "Something has gone wrong."}, status=500)
     else:
-        await app.redis.expire(f'{penguin_id}.{size}.avatar', cache_expiry)
+        await app.ctx.redis.expire(f'{penguin_id}.{size}.avatar', cache_expiry)
     return response.raw(image, headers={'Content-type': 'image/png'})
 
 

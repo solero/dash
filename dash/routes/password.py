@@ -25,7 +25,7 @@ async def password_reset_page(_, lang):
 
 @password.get('/<lang:(en|fr|pt|es)>/<reset_token>')
 async def choose_password_page(_, lang, reset_token):
-    reset_key = await app.redis.get(f'{reset_token}.reset_key')
+    reset_key = await app.ctx.redis.get(f'{reset_token}.reset_key')
     if reset_key:
         template = env.get_template(f'password/choose/{lang}.html')
         page = template.render(
@@ -89,7 +89,7 @@ async def request_password_reset(request, lang):
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
         sg.send(message)
-        await app.redis.setex(f'{reset_key}.reset_key', app.config.AUTH_TTL, data.id)
+        await app.ctx.redis.setex(f'{reset_key}.reset_key', app.config.AUTH_TTL, data.id)
     return response.json(
         [
             _remove_selector('#edit-name'),
@@ -115,7 +115,7 @@ async def request_password_reset(request, lang):
 async def choose_password(request, lang, reset_token):
     new_password = request.form.get('password', None)
     confirm_password = request.form.get('confirm_password', None)
-    player_id = await app.redis.get(f'{reset_token}.reset_key')
+    player_id = await app.ctx.redis.get(f'{reset_token}.reset_key')
     try:
         player_id = player_id.decode()
     except AttributeError:
@@ -174,7 +174,7 @@ async def choose_password(request, lang, reset_token):
     new_password = Crypto.hash(new_password).upper()
     new_password = Crypto.get_login_hash(new_password, rndk=app.config.STATIC_KEY)
     new_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
-    await app.redis.delete(f'{reset_token}.reset_key')
+    await app.ctx.redis.delete(f'{reset_token}.reset_key')
     await Penguin.update.values(password=new_password).where(Penguin.id == data.id).gino.status()
     return response.json(
         [
