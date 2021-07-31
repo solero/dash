@@ -25,12 +25,8 @@ async def start_services(sanic, loop):
                       f'{app.config.POSTGRES_HOST}/'
                       f'{app.config.POSTGRES_NAME}')
 
-    app.ctx.redis = await aioredis.create_redis_pool(
-        f'redis://{app.config.REDIS_ADDRESS}:{app.config.REDIS_PORT}',
-        minsize=5, 
-        maxsize=10
-    )
-
+    pool = aioredis.ConnectionPool.from_url(f'redis://{app.config.REDIS_ADDRESS}:{app.config.REDIS_PORT}')
+    app.ctx.redis = aioredis.Redis(connection_pool=pool)
 
 def main(args):
     i18n.load_path.append(os.path.abspath('locale'))  
