@@ -83,10 +83,10 @@ async def login_request(request):
     flood_key = f'{request.ip}.flood'
     if not password_correct:
         if await app.ctx.redis.exists(flood_key):
-            tr = app.ctx.redis.multi_exec()
-            tr.incr(flood_key)
-            tr.expire(flood_key, app.config.LOGIN_FAILURE_TIMER)
-            failure_count, _ = await tr.execute()
+            async with app.ctx.redis.pipeline(transaction=True) as tr:
+                tr.incr(flood_key)
+                tr.expire(flood_key, app.config.LOGIN_FAILURE_TIMER)
+                failure_count, _ = await tr.execute()
             if failure_count >= app.config.LOGIN_FAILURE_LIMIT:
                 page = template.render(
                     success_message='',
