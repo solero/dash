@@ -94,8 +94,8 @@ async def login_request(request):
                     site_key=app.config.GSITE_KEY
                 )
                 return response.html(page)
-            else:
-                await app.ctx.redis.setex(flood_key, app.config.LOGIN_FAILURE_TIMER, 1)
+        else:
+            await app.ctx.redis.setex(flood_key, app.config.LOGIN_FAILURE_TIMER, 1)
         page = template.render(
             success_message='',
             error_message='You have entered an incorrect password.',
