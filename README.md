@@ -167,13 +167,13 @@ location /penguin/forgot-password {
 ...
 
 # server_name play.clubpenguin.com
-location ^/(.*)/web-service/snfgenerator/session$ {
-    proxy_pass http://localhost:3000/session;
-    proxy_redirect off;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-}
+ location ~ ^/(.*)/web-service/snfgenerator/session$ {
+     proxy_pass http://localhost:3000/session$is_args$args;
+     proxy_redirect off;
+     proxy_set_header Host $host;
+     proxy_set_header X-Real-IP $remote_addr;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+ }
 
 ...
 
