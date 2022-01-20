@@ -11,4 +11,4 @@ Jinja2
 pillow
 PyYAML
 python-i18n[YAML]
-stegano
+stegano==0.9.9
