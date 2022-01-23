@@ -50,7 +50,7 @@ async def get_avatar(request, penguin_id: int):
         loop = asyncio.get_event_loop()
         try:
             future = loop.run_in_executor(None, build_avatar, clothing, int(size))
-            image = await asyncio.wait_for(future, timeout=5.0, loop=loop)
+            image = await asyncio.wait_for(future, timeout=5.0)
 
             await app.ctx.redis.setex(f'{penguin_id}.{size}.avatar', cache_expiry, image)
         except asyncio.TimeoutError:
