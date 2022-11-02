@@ -1,7 +1,7 @@
 python-Levenshtein
 fast-autocomplete[levenshtein]
 aiohttp
-aioredis
+redis
 sanic
 sanic_session
 sendgrid

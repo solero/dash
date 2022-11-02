@@ -1,6 +1,7 @@
 import os
 
-import aioredis
+from redis import asyncio as aioredis
+
 import i18n
 
 from dash import app, settings
