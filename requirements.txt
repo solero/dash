@@ -2,7 +2,7 @@ python-Levenshtein
 fast-autocomplete[levenshtein]
 aiohttp
 redis
-sanic
+sanic==21.12.2
 sanic_session
 sendgrid
 bcrypt
