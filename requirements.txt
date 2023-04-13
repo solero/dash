@@ -12,3 +12,4 @@ pillow
 PyYAML
 python-i18n[YAML]
 stegano==0.9.9
+websockets==10.2
