@@ -38,7 +38,7 @@ async def snfgenerator(request: Request):
 
         if login_key.decode() != token:
             return response.json(
-                {'hasError': True, 'error': 'Login key mismatch', 'data': ''},
+                {'hasError': True, 'error': 'Invalid token', 'data': ''},
                 status=401
             )
 
