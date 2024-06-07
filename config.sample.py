@@ -159,5 +159,17 @@ LOGIN_FAILURE_TIMER = 3600
 LOGIN_FAILURE_LIMIT = 5
 
 
+"""
+Card-Jitsu Snow
+---------------
+CJS_HOST : str
+    External ip or domain of the Card-Jitsu Snow game server.
+CJS_PORT : int
+    Port of the Card-Jitsu Snow game server.
+"""
+CJS_HOST = 'localhost'
+CJS_PORT = 7002
+
+
 # For more configuration settings see
 # https://sanic.readthedocs.io/en/latest/sanic/config.html#builtin-configuration-values
