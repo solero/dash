@@ -1,7 +1,5 @@
 from sanic import Blueprint, HTTPResponse, response
 from sanic.log import logger
-
-from dash import settings
 from dash import app
 
 swrequest = Blueprint('swrequest', url_prefix='/swrequest')
@@ -56,7 +54,7 @@ async def swhandler(request):
         if session_key.decode() != token:
             return error_response(3525, 'Cannot Start World', 'Invalid token')
 
-        return world_response(token, world_name, settings.CJS_HOST, settings.CJS_PORT)
+        return world_response(token, world_name, app.config.CJS_HOST, app.config.CJS_PORT)
     except Exception as error:
         logger.warning(error)
         return error_response(1, 'Cannot Start World', 'Internal Error')
