@@ -21,7 +21,7 @@ avatar_item_directory = os.path.abspath("./items")
 async def check_avatar_item_directory(app, loop):
     if not os.path.exists(avatar_item_directory):
         logger.warn((f'Avatar directory \'{avatar_item_directory}\' is missing! '
-                     'Either download from https://icer.ink/media1.clubpenguin.com/avatar/paper/ '
+                     'Either download from https://icerink.solero.me/media1.clubpenguin.com/avatar/paper/ '
                      'or let wand mount the directory for you!'))
 
 
