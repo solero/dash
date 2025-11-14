@@ -19,35 +19,28 @@ class PenguinPostcard(db.Model):
     has_read = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
 
 def sendEmail(to_emails, subject, html_content):
-    if app.config.EMAIL_METHOD == 'SENDGRID':
-        message = Mail(
-            from_email=app.config.FROM_EMAIL,
-            to_emails=to_emails,
-            subject=subject,
-            html_content=html_content
-        )
-        sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        sg.send(message)
-    
-    elif app.config.EMAIL_METHOD == 'SMTP':
-        msg = MIMEText(html_content, 'html')
-        msg['Subject'] = subject
-        msg['From'] = app.config.FROM_EMAIL
-        
-        conn = None
-        if app.config.SMTP_SSL:
-            conn = SMTP_SSL(
-                host=app.config.SMTP_HOST,
-                port=app.config.SMTP_PORT
+    match app.config.EMAIL_METHOD:
+        case 'SENDGRID':
+            message = Mail(
+                from_email=app.config.FROM_EMAIL,
+                to_emails=to_emails,
+                subject=subject,
+                html_content=html_content
             )
-        else:
-            conn = SMTP(
-                host=app.config.SMTP_HOST,
-                port=app.config.SMTP_PORT
-            )
-        conn.set_debuglevel(False)
-        conn.login(app.config.SMTP_USER, app.config.SMTP_PASS)
-        try:
-            conn.sendmail(app.config.FROM_EMAIL, to_emails, msg.as_string())
-        finally:
-            conn.quit()
+            sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
+            sg.send(message)
+        case 'SMTP':
+            msg = MIMEText(html_content, 'html')
+            msg['Subject'] = subject
+            msg['From'] = app.config.FROM_EMAIL
+
+            smtp_class = SMTP_SSL if app.config.SMTP_SSL else SMTP
+
+            with smtp_class(app.config.SMTP_HOST, app.config.SMTP_PORT) as conn:
+                conn.set_debuglevel(False)
+                conn.login(app.config.SMTP_USER, app.config.SMTP_PASS)
+                conn.sendmail(app.config.FROM_EMAIL, to_emails, msg.as_string())
+        case '':
+            pass
+        case _:
+            raise ValueError(f"Unsupported email method: {app.config.EMAIL_METHOD}")
