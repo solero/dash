@@ -28,26 +28,18 @@ def sendEmail(to_emails, subject, html_content):
         )
         sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
         sg.send(message)
-    
-    elif app.config.EMAIL_METHOD == 'SMTP':
-        msg = MIMEText(html_content, 'html')
-        msg['Subject'] = subject
-        msg['From'] = app.config.FROM_EMAIL
-        
-        conn = None
-        if app.config.SMTP_SSL:
-            conn = SMTP_SSL(
-                host=app.config.SMTP_HOST,
-                port=app.config.SMTP_PORT
-            )
-        else:
-            conn = SMTP(
-                host=app.config.SMTP_HOST,
-                port=app.config.SMTP_PORT
-            )
+        return
+
+    if app.config.EMAIL_METHOD != 'SMTP':
+        return
+
+    msg = MIMEText(html_content, 'html')
+    msg['Subject'] = subject
+    msg['From'] = app.config.FROM_EMAIL
+
+    smtp_class = SMTP_SSL if app.config.SMTP_SSL else SMTP
+
+    with smtp_class(app.config.SMTP_HOST, app.config.SMTP_PORT) as conn:
         conn.set_debuglevel(False)
         conn.login(app.config.SMTP_USER, app.config.SMTP_PASS)
-        try:
-            conn.sendmail(app.config.FROM_EMAIL, to_emails, msg.as_string())
-        finally:
-            conn.quit()
+        conn.sendmail(app.config.FROM_EMAIL, to_emails, msg.as_string())
