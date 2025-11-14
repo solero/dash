@@ -4,10 +4,10 @@ import aiohttp
 import bcrypt
 import i18n
 from sanic import Blueprint, response
-from sendgrid import Mail, SendGridAPIClient
 
 from dash import app, env
 from dash.crypto import Crypto
+from dash.data.mail import sendEmail
 from dash.data.penguin import Penguin
 
 password = Blueprint('password', url_prefix='/password')
@@ -78,8 +78,9 @@ async def request_password_reset(request, lang):
     if data and data.email == email:
         reset_key = secrets.token_urlsafe(45)
         mail_template = env.get_template(f'emails/password/{lang}.html')
-        message = Mail(
-            from_email=app.config.FROM_EMAIL, to_emails=email,
+
+        sendEmail(
+            to_emails=email,
             subject=i18n.t('password.reset_password_subject', locale=lang),
             html_content=mail_template.render(
                 username=username, 
@@ -87,8 +88,7 @@ async def request_password_reset(request, lang):
                 reset_link=f'{app.config.VANILLA_PLAY_LINK}/{lang}/penguin/forgot-password/{reset_key}'
             )
         )
-        sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        sg.send(message)
+
         await app.ctx.redis.setex(f'{reset_key}.reset_key', app.config.AUTH_TTL, data.id)
     return response.json(
         [

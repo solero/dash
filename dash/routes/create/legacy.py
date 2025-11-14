@@ -8,13 +8,12 @@ import aiohttp
 import bcrypt
 import i18n
 from sanic import Blueprint, response
-from sendgrid import Mail, SendGridAPIClient
 
 from dash import app, env
 from dash.crypto import Crypto
 from dash.data import db
 from dash.data.item import PenguinItem
-from dash.data.mail import PenguinPostcard
+from dash.data.mail import PenguinPostcard, sendEmail
 from dash.data.penguin import ActivationKey, Penguin
 
 legacy_create = Blueprint('legacy_create', url_prefix='/create/legacy')
@@ -179,16 +178,16 @@ async def validate_password_email(request):
         activation_key = secrets.token_urlsafe(45)
 
         mail_template = env.get_template(f'emails/activation/legacy/{lang}.html')
-        message = Mail(
-            from_email=app.config.FROM_EMAIL, to_emails=email,
+
+        sendEmail(
+            to_emails=email,
             subject=i18n.t('activate.mail_subject', locale=lang),
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
                 activate_link=f'{app.config.LEGACY_PLAY_LINK}/penguin/activate/{activation_key}'
             )
         )
-        sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        sg.send(message)
+
         await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
 
     return response.text(urlencode({'success': 1}))

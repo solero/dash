@@ -93,14 +93,26 @@ VANILLA_ACTIVATE_REDIRECT = 'http://play.clubpenguin.com'
 """
 Email
 -----
-
+EMAIL_METHOD : str
+    Options: SENDGRID, SMTP, <blank>
+    Choose a method to send emails.
 SITE_NAME : str
     The name of your site.
 FROM_EMAIL : str
-    Will appear as the sender for emails sent via the SendGrid
-    API.
+    Will appear as the sender for emails.
 SENDGRID_API_KEY : str
     Required for sending emails via the SendGrid API.
+SMTP_HOST : str
+    Required for sending emails via SMTP server.
+SMTP_PORT : int
+    Required for sending emails via SMTP server.
+SMTP_USER : str
+    Required for sending emails via SMTP server.
+SMTP_PASS : str
+    Required for sending emails via SMTP server.
+SMTP_SSL : bool
+    Required for sending emails via SMTP server.
+    Set to True to connect to the server with SSL.
 EMAIL_WHITELIST : list
     List of email domains to accept. If set to an empty list
     or `None` then dash will assume all email domains are
@@ -108,13 +120,22 @@ EMAIL_WHITELIST : list
 MAX_ACCOUNT_EMAIL : int
     Number of accounts which can be tied to a single email
     address.
-
 .. SendGrid registration:
     https://signup.sendgrid.com/
 """
+EMAIL_METHOD = ''
+
 SITE_NAME = 'Houdini'
 FROM_EMAIL = 'noreply@houdi.ni'
+
 SENDGRID_API_KEY = ''
+
+SMTP_HOST = ''
+SMTP_PORT = ''
+SMTP_USER = ''
+SMTP_PASS = ''
+SMTP_SSL = True
+
 EMAIL_WHITELIST = ['gmail.com', 'hotmail.com', 'icloud.com', 'yahoo.com', 'aol.com']
 MAX_ACCOUNT_EMAIL = 5
 
@@ -155,6 +176,15 @@ PASSWORD_REDIRECT : str
 AUTH_TTL = 3600
 PASSWORD_REDIRECT = ''
 
+"""
+Manager
+-----------------
+LOGIN_FAILURE_TIMER : int
+    Time in seconds till the temporary login ban expires.
+LOGIN_FAILURE_LIMIT : int
+    Amount of times a player can attempt to login 
+    before being locked out.
+"""
 LOGIN_FAILURE_TIMER = 3600
 LOGIN_FAILURE_LIMIT = 5
 
