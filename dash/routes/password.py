@@ -7,7 +7,7 @@ from sanic import Blueprint, response
 
 from dash import app, env
 from dash.crypto import Crypto
-from dash.data.mail import sendEmail
+from dash.data.mail import send_email
 from dash.data.penguin import Penguin
 
 password = Blueprint('password', url_prefix='/password')
@@ -79,7 +79,7 @@ async def request_password_reset(request, lang):
         reset_key = secrets.token_urlsafe(45)
         mail_template = env.get_template(f'emails/password/{lang}.html')
 
-        sendEmail(
+        send_email(
             to_emails=email,
             subject=i18n.t('password.reset_password_subject', locale=lang),
             html_content=mail_template.render(

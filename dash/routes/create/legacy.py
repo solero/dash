@@ -13,7 +13,7 @@ from dash import app, env
 from dash.crypto import Crypto
 from dash.data import db
 from dash.data.item import PenguinItem
-from dash.data.mail import PenguinPostcard, sendEmail
+from dash.data.mail import PenguinPostcard, send_email
 from dash.data.penguin import ActivationKey, Penguin
 
 legacy_create = Blueprint('legacy_create', url_prefix='/create/legacy')
@@ -179,7 +179,7 @@ async def validate_password_email(request):
 
         mail_template = env.get_template(f'emails/activation/legacy/{lang}.html')
 
-        sendEmail(
+        send_email(
             to_emails=email,
             subject=i18n.t('activate.mail_subject', locale=lang),
             html_content=mail_template.render(

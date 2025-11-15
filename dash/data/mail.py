@@ -18,7 +18,7 @@ class PenguinPostcard(db.Model):
     details = db.Column(db.String(255), nullable=False, server_default=db.text("''::character varying"))
     has_read = db.Column(db.Boolean, nullable=False, server_default=db.text("false"))
 
-def sendEmail(to_emails, subject, html_content):
+def send_email(to_emails, subject, html_content):
     match app.config.EMAIL_METHOD:
         case 'SENDGRID':
             message = Mail(

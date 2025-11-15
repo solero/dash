@@ -17,7 +17,7 @@ from dash import app, env
 from dash.crypto import Crypto
 from dash.data import db
 from dash.data.item import PenguinItem
-from dash.data.mail import PenguinPostcard, sendEmail
+from dash.data.mail import PenguinPostcard, send_email
 from dash.data.penguin import ActivationKey, Penguin
 
 vanilla_create = Blueprint('vanilla_create', url_prefix='/create/vanilla')
@@ -178,7 +178,7 @@ async def _validate_registration(request, lang):
         activation_key = secrets.token_urlsafe(45)
         mail_template = env.get_template(f'emails/activation/vanilla/{lang}.html')
 
-        sendEmail(
+        send_email(
             to_emails=email,
             subject=i18n.t('activate.mail_subject', locale=lang),
             html_content=mail_template.render(
