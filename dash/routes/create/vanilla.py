@@ -11,14 +11,13 @@ import bcrypt
 import i18n
 from PIL import Image
 from sanic import Blueprint, response
-from sendgrid import Mail, SendGridAPIClient
 from stegano import lsb
 
 from dash import app, env
 from dash.crypto import Crypto
 from dash.data import db
 from dash.data.item import PenguinItem
-from dash.data.mail import PenguinPostcard
+from dash.data.mail import PenguinPostcard, send_email
 from dash.data.penguin import ActivationKey, Penguin
 
 vanilla_create = Blueprint('vanilla_create', url_prefix='/create/vanilla')
@@ -178,8 +177,9 @@ async def _validate_registration(request, lang):
     if not app.config.ACTIVATE_PLAYER:
         activation_key = secrets.token_urlsafe(45)
         mail_template = env.get_template(f'emails/activation/vanilla/{lang}.html')
-        message = Mail(
-            from_email=app.config.FROM_EMAIL, to_emails=email,
+
+        send_email(
+            to_emails=email,
             subject=i18n.t('activate.mail_subject', locale=lang),
             html_content=mail_template.render(
                 penguin=penguin, site_name=app.config.SITE_NAME,
@@ -188,8 +188,7 @@ async def _validate_registration(request, lang):
                 activate_link=f'{app.config.VANILLA_PLAY_LINK}/{lang}/penguin/activate'
             )
         )
-        sg = SendGridAPIClient(app.config.SENDGRID_API_KEY)
-        sg.send(message)
+
         await ActivationKey.create(penguin_id=penguin.id, activation_key=activation_key)
     return response.redirect(app.config.VANILLA_PLAY_LINK)
 

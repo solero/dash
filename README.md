@@ -41,7 +41,7 @@
 - Provides API for password resets.
 - Highly configurable!
 
-**Requires SendGrid API key*
+**Requires SendGrid API key or SMTP server*
 
 ## Installation
 
